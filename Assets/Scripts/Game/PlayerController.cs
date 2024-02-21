@@ -1,9 +1,7 @@
 using Cinemachine;
-using System;
-using TMPro;
 using TokioSchool.FinalProject.Core;
+using TokioSchool.FinalProject.Equipments;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace TokioSchool.FinalProject.Player
 {
@@ -12,7 +10,6 @@ namespace TokioSchool.FinalProject.Player
         [SerializeField] private float playerSpeed = 2.0f;
         [SerializeField] private float jumpHeight = 1.0f;
         [SerializeField] private float gravityValue = -9.81f;
-        [SerializeField] private float reloadingTime = 1f;
         [SerializeField] private float stamina = 100f;
         [SerializeField] private float life = 100f;
         [SerializeField] private GameObject playerModel;
@@ -27,13 +24,11 @@ namespace TokioSchool.FinalProject.Player
         private bool isGrounded;
         private bool aiming;
         private bool isCrouched;
-        private bool reloading;
         private bool lowStamina;
         private InputManager inputManager;
         private Transform cameraTransform;
+        private Equipment equipment;
         private Animator animator;
-        private float reloadTimer;
-        private int currentBullets;
         private float currentStamina;
         private float currentLife;
 
@@ -44,25 +39,22 @@ namespace TokioSchool.FinalProject.Player
         private int animIsGrounded;
         private int animIsCrouched;
         private int animAim;
-        private int animAttack;
         private int animJump;
 
-
-        public int CurrentBullets { get => currentBullets; }
         public float CurrentLife { get => currentLife; }
         public float CurrentStamina { get => currentStamina; }
-        public bool IsReloading { get => reloading; set => reloading = value; }
-        public float ReloadTimer { get => reloadTimer; set => reloadTimer = value; }
         public float Life { get => life; }
         public float Stamina { get => stamina; }
+        public bool Aiming { get => aiming; }
+        public Quaternion Rotation { get => cameraTransform.rotation; }
 
         private void Start()
         {
             controller = GetComponent<CharacterController>();
+            equipment = GetComponent<Equipment>();
             animator = GetComponentInChildren<Animator>();
             inputManager = InputManager.Instance;
             cameraTransform = Camera.main.transform;
-            reloadTimer = reloadingTime;
             currentStamina = stamina;
             currentLife = life;
 
@@ -73,7 +65,6 @@ namespace TokioSchool.FinalProject.Player
             animIsGrounded = Animator.StringToHash("IsGrounded");
             animIsCrouched = Animator.StringToHash("IsCrouched");
             animAim = Animator.StringToHash("Aiming");
-            animAttack = Animator.StringToHash("Attack");
             animJump = Animator.StringToHash("Jump");
         }
 
@@ -107,7 +98,6 @@ namespace TokioSchool.FinalProject.Player
             animator.SetFloat(animXDirection, movement.x);
             animator.SetFloat(animZDirection, movement.y);
 
-            Reload();
             Aim();
             Attack();
             StaminaHandler();
@@ -133,61 +123,15 @@ namespace TokioSchool.FinalProject.Player
             }
         }
 
-        private void Reload()
-        {
-            if (inputManager.PlayerReload())
-            {
-                reloading = true;
-                //UIController.Instance.ActiveReloadUI(true);
-            }
-
-            if (reloading)
-            {
-                reloadTimer -= Time.deltaTime;
-                if (reloadTimer < 0)
-                {
-                    reloadTimer = reloadingTime;
-
-                    //int totalAmmo = 0;
-                    //int totalInitialAmmo = 0;
-                    //foreach (Weapon weapon in CurrentWeaponList)
-                    //{
-                    //    totalInitialAmmo += weapon.BulletInitialAmmount;
-                    //    if (weapon.BulletAmmount < weapon.BulletInitialAmmount)
-                    //    {
-                    //        weapon.BulletAmmount++;
-                    //        totalAmmo += weapon.BulletAmmount;
-                    //    }
-                    //}
-                    //currentBullets = totalAmmo;
-                    //UIController.Instance.UpdateUI();
-                    //if (totalInitialAmmo <= totalAmmo)
-                    //{
-                    //    reloading = false;
-                    //    UIController.Instance.ActiveReloadUI(false);
-                    //}
-                }
-            }
-        }
-
         private void Attack()
         {
-            if (aiming && inputManager.PlayerAttack() && !reloading && currentBullets > 0)
+            bool canAttack = (aiming && inputManager.PlayerAttack()) || (equipment.CanAttackWithoutAim && inputManager.PlayerAttack());
+            if (canAttack)
             {
-                //animator.SetTrigger(animAttack);
-                //int totalAmmo = 0;
-                //foreach (Weapon weapon in CurrentWeaponList)
-                //{
-                //    if (weapon.BulletAmmount > 0)
-                //    {
-                //        weapon.OnShoot();
-                //        totalAmmo += weapon.BulletAmmount;
-                //    }
-                //}
-                //currentBullets = totalAmmo;
-                //UIController.Instance.UpdateUI();
+                equipment.ActionAnimation();
             }
         }
+
         private void Crouch()
         {
             if (inputManager.PlayerCrouched())
@@ -211,22 +155,16 @@ namespace TokioSchool.FinalProject.Player
 
         private void Aim()
         {
-            if (!reloading)
+            animator.SetBool(animAim, isGrounded && inputManager.PlayerAiming());
+
+            if (isGrounded && inputManager.PlayerAiming())
             {
-                //animator.SetBool(animAim, groundedPlayer && inputManager.PlayerAiming());
-                //
-                //if (groundedPlayer && inputManager.PlayerAiming())
-                //{
-                //    aiming = true;
-                //    aimingCamera.Priority = 1;
-                //    followedCamera.Priority = 0;
-                //}
-                //else
-                //{
-                //    aiming = false;
-                //    aimingCamera.Priority = 0;
-                //    followedCamera.Priority = 1;
-                //}
+                equipment.HoldAnimation();
+                aiming = true;
+            }
+            else
+            {
+                aiming = false;
             }
         }
 

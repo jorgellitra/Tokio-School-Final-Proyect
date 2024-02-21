@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d74e6693814f6844592119b1c0769408, type: 3}
+  m_Name: Staff
+  m_EditorClassIdentifier: 
+  id: 14884b54-51c2-4813-9934-427dcd969520
+  title: Staff
+  leftHandPrefab: {fileID: 0}
+  rightHandPrefab: {fileID: 181317182782703767, guid: de279c52efa61244a8b32928f68e599c, type: 3}
+  holdAnimation: {fileID: 5216835599920345141, guid: d6557ad5f7261ce4c8fe9f8f67c9d4cd, type: 3}
+  actionAnimation: {fileID: 6571473395271613878, guid: afb2e0e8e5b867f49ad94f4e813c3570, type: 3}
+  particleOnHold: {fileID: 0}
+  projectileOnAction: {fileID: 11400000, guid: 87050777576b05046b5f8d48d8aea5d7, type: 2}
+  canAttackWithoutAim: 0

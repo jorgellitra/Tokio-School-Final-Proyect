@@ -7,7 +7,6 @@ namespace TokioSchool.FinalProject.Core
     {
         [SerializeField] private float horizontalSpeed = 10f;
         [SerializeField] private float verticalSpeed = 10f;
-        [SerializeField] private float clampHorizontalAngle = 70f;
         [SerializeField] private float clampVerticalAngle = 50f;
 
         private InputManager inputManager;

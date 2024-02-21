@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using TokioSchool.FinalProject.Singletons;
 using UnityEngine;
 
 namespace TokioSchool.FinalProject.UI
 {
-    public class UIController : MonoBehaviour
+    public class UIController : Singleton<UIController>
     {
         [Header("Main Properties")]
         public UIPanel startScreen;
@@ -15,14 +16,6 @@ namespace TokioSchool.FinalProject.UI
         public UIPanel CurrentScreen { get { return currentScreen; } }
         private Stack<UIPanel> previousScreens;
         public Stack<UIPanel> PreviousScreens { get { return previousScreens; } }
-
-        private UIController instance;
-        public UIController Instance { get => instance; set => instance = value; }
-
-        private void Awake()
-        {
-            instance = this;
-        }
 
         void Start()
         {

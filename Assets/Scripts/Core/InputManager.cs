@@ -1,18 +1,14 @@
+using TokioSchool.FinalProject.Singletons;
 using UnityEngine;
 
 namespace TokioSchool.FinalProject.Core
 {
-    public class InputManager : MonoBehaviour
+    public class InputManager : Singleton<InputManager>
     {
         private PlayerInputs playerControls;
 
-        private static InputManager instance;
-
-        public static InputManager Instance { get => instance; set => instance = value; }
-
         private void Awake()
         {
-            instance = this;
             playerControls = new PlayerInputs();
             Cursor.lockState = CursorLockMode.Locked;
         }
@@ -48,6 +44,10 @@ namespace TokioSchool.FinalProject.Core
         public bool PlayerAttack()
         {
             return playerControls.Player.Attack.triggered;
+        }
+        public bool PlayerHold()
+        {
+            return playerControls.Player.Hold.IsPressed();
         }
         public bool PlayerReload()
         {
