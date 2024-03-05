@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Bow
   m_EditorClassIdentifier: 
   id: a4b0b124-2909-440f-8903-d93da0762665
-  title: Bow
+  attackCooldown: 1
   leftHandPrefab: {fileID: 8169320711831945143, guid: c32cc952f3c4a9444a78b29fbb266952, type: 3}
   rightHandPrefab: {fileID: 0}
   holdAnimation: {fileID: -203655887218126122, guid: ea5990b20d915eb45a99c46867a8c268, type: 3}

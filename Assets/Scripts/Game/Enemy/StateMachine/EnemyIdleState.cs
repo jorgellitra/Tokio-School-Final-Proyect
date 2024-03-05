@@ -27,12 +27,12 @@ namespace TokioSchool.FinalProject.Enemy
             waitingTimeReset = enemy.waitingTimeIdle;
             goPatrol = false;
 
-            Debug.Log("EnterState idle");
+            //Debug.Log("EnterState idle");
         }
 
         public override void ExitState()
         {
-            Debug.Log("ExitState idle");
+            //Debug.Log("ExitState idle");
         }
 
         public override EnemyStateMachine.EnemyState GetNextState()
@@ -40,6 +40,11 @@ namespace TokioSchool.FinalProject.Enemy
             if (enemy.playerInRangeToChase)
             {
                 return EnemyStateMachine.EnemyState.Chase;
+            }
+
+            if (enemy.Controller.Dead)
+            {
+                return EnemyStateMachine.EnemyState.Dead;
             }
 
             if (goPatrol)

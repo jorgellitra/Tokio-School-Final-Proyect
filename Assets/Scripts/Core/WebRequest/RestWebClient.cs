@@ -14,6 +14,8 @@ namespace TokioSchool.FinalProject.Core
             using UnityWebRequest webRequest = UnityWebRequest.Get(url);
             yield return webRequest.SendWebRequest();
 
+            Debug.Log("URL: " + url);
+
             if (webRequest.result == UnityWebRequest.Result.ConnectionError)
             {
                 callback(new Response

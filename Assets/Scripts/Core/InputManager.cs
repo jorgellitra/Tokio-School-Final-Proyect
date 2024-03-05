@@ -1,5 +1,7 @@
+using System;
 using TokioSchool.FinalProject.Singletons;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace TokioSchool.FinalProject.Core
 {
@@ -60,6 +62,14 @@ namespace TokioSchool.FinalProject.Core
         public bool PlayerCrouched()
         {
             return playerControls.Player.Crouch.triggered;
+        }
+        public bool PlayerChangeWeaponPressed()
+        {
+            return playerControls.Player.ChangeWeapon.triggered;
+        }
+        public InputAction GetChangeWeaponAction()
+        {
+            return playerControls.Player.ChangeWeapon;
         }
     }
 }

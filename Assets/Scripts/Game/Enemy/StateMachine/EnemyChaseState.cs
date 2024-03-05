@@ -23,13 +23,13 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override void EnterState()
         {
-            Debug.Log("EnterState Chase");
+            //Debug.Log("EnterState Chase");
             navAgent.speed = enemy.runSpeed;
         }
 
         public override void ExitState()
         {
-            Debug.Log("ExitState Chase");
+            //Debug.Log("ExitState Chase");
             navAgent.speed = enemy.walkSpeed;
         }
 
@@ -38,6 +38,11 @@ namespace TokioSchool.FinalProject.Enemy
             if (!enemy.playerInRangeToChase)
             {
                 return EnemyStateMachine.EnemyState.Idle;
+            }
+
+            if (enemy.Controller.Dead)
+            {
+                return EnemyStateMachine.EnemyState.Dead;
             }
 
             return enemy.playerInRangeToAttack ? EnemyStateMachine.EnemyState.Attack : EnemyStateMachine.EnemyState.Chase;

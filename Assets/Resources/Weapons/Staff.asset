@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Staff
   m_EditorClassIdentifier: 
   id: 14884b54-51c2-4813-9934-427dcd969520
-  title: Staff
+  attackCooldown: 1.5
   leftHandPrefab: {fileID: 0}
   rightHandPrefab: {fileID: 181317182782703767, guid: de279c52efa61244a8b32928f68e599c, type: 3}
   holdAnimation: {fileID: 5216835599920345141, guid: d6557ad5f7261ce4c8fe9f8f67c9d4cd, type: 3}

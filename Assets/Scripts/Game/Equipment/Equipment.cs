@@ -11,32 +11,28 @@ namespace TokioSchool.FinalProject.Equipments
         [SerializeField] private Transform leftHand;
         [SerializeField] private Transform rightHand;
         [SerializeField] private Weapon defaultWeapon;
+        [SerializeField] private List<Weapon> weapons;
 
-        private List<Weapon> weapons = new();
         private Weapon currentWeapon;
         private Animator animator;
-        private PlayerController player;
         private bool canAttackWithoutAim;
+        private bool attackOnCooldown;
+        private bool holdingAnimationState;
 
+        public bool AttackOnCooldown { get => attackOnCooldown; }
         public bool CanAttackWithoutAim { get => canAttackWithoutAim; }
+        public Weapon CurrentWeapon { get => currentWeapon; }
 
         private void Awake()
         {
             animator = GetComponentInChildren<Animator>();
-            player = GetComponent<PlayerController>();
-
-            var weaponList = Resources.LoadAll<Weapon>("");
-            foreach (Weapon weapon in weaponList)
-            {
-                weapons.Add(weapon);
-            }
 
             currentWeapon = defaultWeapon;
         }
 
-        public void SetupWeapon(string weaponId)
+        public void SetupWeapon(int weaponIndex)
         {
-            currentWeapon = weapons.Find(w => w.Id == weaponId);
+            currentWeapon = weapons[weaponIndex];
             rightHand.DestroyChildren();
             leftHand.DestroyChildren();
 
@@ -59,20 +55,33 @@ namespace TokioSchool.FinalProject.Equipments
 
         public void ActionAnimation()
         {
-            animator.Play(currentWeapon.ActionAnimation.name);
-            if (currentWeapon.ProjectileOnAction != null)
+            if (!attackOnCooldown)
             {
-                var caster = Camera.main.transform;
-                Instantiate(currentWeapon.ProjectileOnAction.Prefab, caster.position + caster.forward, caster.rotation);
+                StartCoroutine(AttackCooldownCoroutine(currentWeapon.AttackCooldown));
+                animator.Play(currentWeapon.ActionAnimation.name);
+                if (currentWeapon.ProjectileOnAction != null)
+                {
+                    var caster = Camera.main.transform;
+                    Instantiate(currentWeapon.ProjectileOnAction.Prefab, caster.position + caster.forward, caster.rotation);
+                }
             }
         }
 
         public void HoldAnimation()
         {
-            if (!player.Aiming && currentWeapon.HoldAnimation != null)
+            if (!holdingAnimationState && currentWeapon.HoldAnimation != null && !attackOnCooldown)
             {
+                holdingAnimationState = true;
                 animator.Play(currentWeapon.HoldAnimation.name);
             }
+        }
+
+        IEnumerator AttackCooldownCoroutine(float seconds)
+        {
+            attackOnCooldown = true;
+            yield return new WaitForSeconds(seconds);
+            attackOnCooldown = false;
+            holdingAnimationState = false;
         }
     }
 }

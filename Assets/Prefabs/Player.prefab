@@ -564,12 +564,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2463062438434674831}
-  m_LocalRotation: {x: -0.000000007450581, y: 1.464046e-10, z: -3.1309816e-11, w: 1}
-  m_LocalPosition: {x: 0, y: -0.097, z: -0.019}
+  m_LocalRotation: {x: -0.0000000039581196, y: 0.00000004097818, z: 0.0000000040163273, w: 1}
+  m_LocalPosition: {x: -0, y: 0.147, z: 0.175}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 3825049697220958378}
+  m_Father: {fileID: 1005766412393896974}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2486062869694810537
@@ -1536,6 +1536,7 @@ GameObject:
   - component: {fileID: 7859958673003240879}
   - component: {fileID: 5806359086421632367}
   - component: {fileID: 4314716273359613352}
+  - component: {fileID: 2141004034997212445}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1551,7 +1552,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4747739406019829574}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.016715402, y: 1.7154675, z: 0.048711065}
+  m_LocalPosition: {x: 0.018420624, y: 1.7134345, z: 0.11522963}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1589,7 +1590,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.2
+  near clip plane: 0.04
   far clip plane: 10000
   field of view: 60.000004
   orthographic: 0
@@ -1659,6 +1660,66 @@ MonoBehaviour:
   m_CameraActivatedEvent:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &2141004034997212445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4747739406019829574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 948f4100a11a5c24981795d21301da5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  volumeTrigger: {fileID: 3381472714858713124}
+  volumeLayer:
+    serializedVersion: 2
+    m_Bits: 17
+  stopNaNPropagation: 1
+  finalBlitToCameraTarget: 0
+  antialiasingMode: 3
+  temporalAntialiasing:
+    jitterSpread: 0.75
+    sharpness: 0.25
+    stationaryBlending: 0.95
+    motionBlending: 0.85
+  subpixelMorphologicalAntialiasing:
+    quality: 2
+  fastApproximateAntialiasing:
+    fastMode: 0
+    keepAlpha: 0
+  fog:
+    enabled: 1
+    excludeSkybox: 1
+  debugLayer:
+    lightMeter:
+      width: 512
+      height: 256
+      showCurves: 1
+    histogram:
+      width: 512
+      height: 256
+      channel: 3
+    waveform:
+      exposure: 0.12
+      height: 256
+    vectorscope:
+      size: 256
+      exposure: 0.12
+    overlaySettings:
+      linearDepth: 0
+      motionColorIntensity: 4
+      motionGridSize: 64
+      colorBlindnessType: 0
+      colorBlindnessStrength: 1
+  m_Resources: {fileID: 11400000, guid: d82512f9c8e5d4a4d938b575d47f88d4, type: 2}
+  m_ShowToolkit: 0
+  m_ShowCustomSorter: 0
+  breakBeforeColorGrading: 0
+  m_BeforeTransparentBundles: []
+  m_BeforeStackBundles: []
+  m_AfterStackBundles: []
 --- !u!1 &4927710254996914656
 GameObject:
   m_ObjectHideFlags: 0
@@ -2074,8 +2135,8 @@ MonoBehaviour:
   m_BindingMode: 1
   m_FollowOffset: {x: 0, y: 0, z: 0}
   m_XDamping: 0.1
-  m_YDamping: 0.5
-  m_ZDamping: 0.1
+  m_YDamping: 0
+  m_ZDamping: 0
   m_AngularDampingMode: 0
   m_PitchDamping: 0
   m_YawDamping: 0
@@ -2128,7 +2189,7 @@ Animator:
   m_Controller: {fileID: 9100000, guid: 3a4bfb3f5be210b41a0a3ff23d79fdf6, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
-  m_ApplyRootMotion: 1
+  m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_WarningMessage: 
@@ -2194,7 +2255,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7010318812089679333}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.016715402, y: 1.7154675, z: 0.048711065}
+  m_LocalPosition: {x: 0.018420624, y: 1.7134345, z: 0.11522963}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2225,7 +2286,7 @@ MonoBehaviour:
   m_Lens:
     FieldOfView: 60.000004
     OrthographicSize: 5
-    NearClipPlane: 0.2
+    NearClipPlane: 0.04
     FarClipPlane: 10000
     Dutch: 0
     ModeOverride: 0
@@ -2284,6 +2345,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 2835736188501624387}
   - {fileID: 3825049697220958378}
   m_Father: {fileID: 7925935754277407099}
   m_RootOrder: -1
@@ -2315,8 +2377,7 @@ Transform:
   m_LocalPosition: {x: -0, y: 0.24441864, z: 0.12742974}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 2835736188501624387}
+  m_Children: []
   m_Father: {fileID: 1005766412393896974}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2453,7 +2514,7 @@ Transform:
   - {fileID: 8829076993114269245}
   - {fileID: 4971061379594082481}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: -100.613, z: 0}
 --- !u!114 &6552848451132958267
 MonoBehaviour:
@@ -2467,7 +2528,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82114d55173ef594ab268d8f8cb255e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerSpeed: 3
+  playerSpeed: 5
   jumpHeight: 1
   gravityValue: -9.81
   stamina: 100
@@ -2480,6 +2541,7 @@ MonoBehaviour:
   followedCameraTransform: {fileID: 2835736188501624387}
   followedCamera: {fileID: 495905601410666065}
   aimingCamera: {fileID: 0}
+  uIPlayerController: {fileID: 0}
 --- !u!114 &3683337472035758509
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2533,6 +2595,11 @@ MonoBehaviour:
   leftHand: {fileID: 8608020615141570298}
   rightHand: {fileID: 8288550163777547938}
   defaultWeapon: {fileID: 11400000, guid: 782261ce97104cd4abac72cc464a8d06, type: 2}
+  weapons:
+  - {fileID: 11400000, guid: 782261ce97104cd4abac72cc464a8d06, type: 2}
+  - {fileID: 11400000, guid: 7cded86817f46cf48bcc077ab94ce188, type: 2}
+  - {fileID: 11400000, guid: ed4c9f560af00684293569187f3cbe97, type: 2}
+  - {fileID: 11400000, guid: 877924879b29ab54aba4b7d725d0969e, type: 2}
 --- !u!1 &8078147104731898081
 GameObject:
   m_ObjectHideFlags: 0

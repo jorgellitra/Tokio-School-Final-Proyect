@@ -8,7 +8,7 @@ namespace TokioSchool.FinalProject.Equipments
     public class Weapon : ScriptableObject, ISerializationCallbackReceiver
     {
         [SerializeField] string id;
-        [SerializeField] string title;
+        [SerializeField] float attackCooldown;
         [SerializeField] GameObject leftHandPrefab;
         [SerializeField] GameObject rightHandPrefab;
         [SerializeField] AnimationClip holdAnimation;
@@ -18,13 +18,13 @@ namespace TokioSchool.FinalProject.Equipments
         [SerializeField] bool canAttackWithoutAim;
 
         public string Id { get => id; }
-        public string Name { get => name; }
         public GameObject LeftHandPrefab { get => leftHandPrefab; }
         public GameObject RightHandPrefab { get => rightHandPrefab; }
         public AnimationClip HoldAnimation { get => holdAnimation; }
         public AnimationClip ActionAnimation { get => actionAnimation; }
         public bool CanAttackWithoutAim { get => canAttackWithoutAim; }
         public ProjectileObject ProjectileOnAction { get => projectileOnAction; }
+        public float AttackCooldown { get => attackCooldown; }
 
         public void OnAfterDeserialize()
         {

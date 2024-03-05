@@ -68,16 +68,6 @@ namespace TokioSchool.FinalProject.Enemy
             anim.SetFloat(animZDirection, 1);
         }
 
-        private void OnEnable()
-        {
-            controller.OnDeath += OnDeath;
-        }
-
-        private void OnDisable()
-        {
-            controller.OnDeath -= OnDeath;
-        }
-
         private void FixedUpdate()
         {
             float distanceEnemyPlayer = Vector3.Distance(player.transform.position, transform.position);
@@ -86,11 +76,6 @@ namespace TokioSchool.FinalProject.Enemy
             playerInRangeToAttack = distanceEnemyPlayer < distanceToAttackPlayer;
 
             anim.SetFloat(animSpeed, navAgent.velocity.sqrMagnitude);
-        }
-
-        private void OnDeath()
-        {
-            currentState = states[EnemyState.Dead];
         }
     }
 }

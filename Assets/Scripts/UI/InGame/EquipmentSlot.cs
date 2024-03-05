@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TokioSchool.FinalProject.Equipments;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 namespace TokioSchool.FinalProject.UI
 {
@@ -11,14 +12,11 @@ namespace TokioSchool.FinalProject.UI
     {
         [SerializeField] private Weapon weapon;
         [SerializeField] private InputAction inputAction;
+        [SerializeField] private Image bgImage;
+        [SerializeField] private Sprite activeImage;
+        [SerializeField] private Sprite unActiveImage;
 
-        private UIPlayerController uiPlayerController;
-
-        private void Awake()
-        {
-            uiPlayerController = GetComponentInParent<UIPlayerController>();
-            inputAction.performed += OnActionPerformed;
-        }
+        public Weapon Weapon { get => weapon; }
 
         private void OnEnable()
         {
@@ -30,9 +28,9 @@ namespace TokioSchool.FinalProject.UI
             inputAction.Disable();
         }
 
-        private void OnActionPerformed(InputAction.CallbackContext obj)
+        public void ChangeStatus(bool state)
         {
-            uiPlayerController.SetupWeaponUI(weapon);
+            bgImage.sprite = state ? activeImage : unActiveImage;
         }
     }
 }

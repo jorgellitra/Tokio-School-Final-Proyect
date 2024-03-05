@@ -221,3 +221,6 @@ MonoBehaviour:
       m_Action: Input
       m_Flags: 0
     m_Flags: 0
+  bgImage: {fileID: 7964398056400069216}
+  activeImage: {fileID: 21300000, guid: 2b34ead8ea3c78b4882a722a736f874c, type: 3}
+  unActiveImage: {fileID: 21300000, guid: e466468e92ffc5549bb6f8ee2198183f, type: 3}

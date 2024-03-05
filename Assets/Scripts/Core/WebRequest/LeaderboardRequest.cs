@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TokioSchool.FinalProject.Configs;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -9,9 +10,7 @@ namespace TokioSchool.FinalProject.Core
 {
     public class LeaderboardRequest : MonoBehaviour
     {
-        [SerializeField] private string baseUrl;
-        [SerializeField] private string getLeaderboardUrl;
-        [SerializeField] private string postLeaderboardUrl;
+        [SerializeField] private AzureConfig azureConfig;
 
         private Action<Response> onGetComplete;
         private Action<Response> onPostComplete;
@@ -21,7 +20,7 @@ namespace TokioSchool.FinalProject.Core
 
         public void GetLeaderboad()
         {
-            StartCoroutine(RestWebClient.Instance.HttpGet($"{baseUrl}/{getLeaderboardUrl}",
+            StartCoroutine(RestWebClient.Instance.HttpGet($"{azureConfig.BaseUrl}/{azureConfig.GetLeaderboard}",
                 (r) => onGetComplete?.Invoke(r)));
         }
 
@@ -33,7 +32,7 @@ namespace TokioSchool.FinalProject.Core
                 Value = "application/json"
             };
 
-            StartCoroutine(RestWebClient.Instance.HttpPost($"{baseUrl}/{postLeaderboardUrl}",
+            StartCoroutine(RestWebClient.Instance.HttpPost($"{azureConfig.BaseUrl}/{azureConfig.PostLeaderboard}",
                 JsonConvert.SerializeObject(leaderboard), (r) => onPostComplete?.Invoke(r), new List<RequestHeader> { header }));
         }
     }

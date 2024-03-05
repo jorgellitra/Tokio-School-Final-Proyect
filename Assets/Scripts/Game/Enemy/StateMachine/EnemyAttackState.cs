@@ -45,6 +45,11 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override EnemyStateMachine.EnemyState GetNextState()
         {
+            if (enemy.Controller.Dead)
+            {
+                return EnemyStateMachine.EnemyState.Dead;
+            }
+
             return !isAttacking ? EnemyStateMachine.EnemyState.Chase : EnemyStateMachine.EnemyState.Attack;
         }
 

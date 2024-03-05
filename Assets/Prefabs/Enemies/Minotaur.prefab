@@ -3549,7 +3549,7 @@ Transform:
   - {fileID: 6012123683852299000}
   - {fileID: 6067629793589489773}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &5417927069382690041
 Animator:
@@ -3639,7 +3639,8 @@ MonoBehaviour:
   canvasUI: {fileID: 2792542618884635405}
   sliderLife: {fileID: 2869096273436878349}
   sliderShield: {fileID: 1834310627581333876}
-  damagePopupPrefab: {fileID: 5521600641680712200}
+  damagePopupContainer: {fileID: 7663519665804972617}
+  damagePopupPrefab: {fileID: 1288309034098812034, guid: fbbccffdf2def1c4ba9ebae86b9e22e7, type: 3}
   Dead: 0
 --- !u!136 &1646914962657297223
 CapsuleCollider:
@@ -4852,13 +4853,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &5521600641680712200 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8056666011650049139, guid: 69622bd54c2333f42b2b9da1fab221ec, type: 3}
-  m_PrefabInstance: {fileID: 2553450323380266619}
-  m_PrefabAsset: {fileID: 0}
 --- !u!224 &6067629793589489773 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8600503837034649110, guid: 69622bd54c2333f42b2b9da1fab221ec, type: 3}
+  m_PrefabInstance: {fileID: 2553450323380266619}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &7663519665804972617 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5275376534933828658, guid: 69622bd54c2333f42b2b9da1fab221ec, type: 3}
   m_PrefabInstance: {fileID: 2553450323380266619}
   m_PrefabAsset: {fileID: 0}

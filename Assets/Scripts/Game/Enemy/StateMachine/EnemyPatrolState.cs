@@ -29,9 +29,12 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override void EnterState()
         {
-            Debug.Log("EnterState Patrol");
-            currentPatrolPoint = enemy.patrolPoints[indexPatrolPoint];
+            //Debug.Log("EnterState Patrol");
             patrolPointReached = false;
+            if (enemy.patrolPoints.Length > 0)
+            {
+                currentPatrolPoint = enemy.patrolPoints[indexPatrolPoint];
+            }
             if (currentPatrolPoint != null)
             {
                 navAgent.SetDestination(currentPatrolPoint.position);
@@ -41,7 +44,7 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override void ExitState()
         {
-            Debug.Log("ExitState Patrol");
+            //Debug.Log("ExitState Patrol");
             if (indexPatrolPoint == enemy.patrolPoints.Length - 1)
             {
                 indexPatrolPoint = 0;
@@ -57,6 +60,11 @@ namespace TokioSchool.FinalProject.Enemy
             if (enemy.playerInRangeToChase)
             {
                 return EnemyStateMachine.EnemyState.Chase;
+            }
+
+            if (enemy.Controller.Dead)
+            {
+                return EnemyStateMachine.EnemyState.Dead;
             }
 
             return patrolPointReached ? EnemyStateMachine.EnemyState.Idle : EnemyStateMachine.EnemyState.Patrol;

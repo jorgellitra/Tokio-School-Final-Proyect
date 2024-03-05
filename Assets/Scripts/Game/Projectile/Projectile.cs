@@ -30,7 +30,6 @@ namespace TokioSchool.FinalProject.Projectiles
         {
             if (timeAliveReset < 0 && !dead)
             {
-                dead = true;
                 Death();
             }
 
@@ -44,7 +43,7 @@ namespace TokioSchool.FinalProject.Projectiles
 
         private void Death()
         {
-            Debug.Log("death");
+            dead = true;
             rb.velocity = Vector3.zero;
             if (projectileObject.ParticleOnEnd != null)
             {
@@ -56,7 +55,6 @@ namespace TokioSchool.FinalProject.Projectiles
 
         private void OnCollisionEnter(Collision collision)
         {
-            Debug.Log(collision.gameObject.name);
             if (collision.gameObject.GetComponent<PlayerController>() == null)
             {
                 Death();

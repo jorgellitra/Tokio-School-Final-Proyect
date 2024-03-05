@@ -13,9 +13,11 @@ MonoBehaviour:
   m_Name: Mace
   m_EditorClassIdentifier: 
   id: 247068a8-297d-4c49-a203-71e743ae6490
-  title: Mace
+  attackCooldown: 0.5
   leftHandPrefab: {fileID: 0}
   rightHandPrefab: {fileID: 7245490326991772184, guid: f06e57b3b76e15141a9adb3337311717, type: 3}
   holdAnimation: {fileID: 6589092039564311902, guid: a8bd4d740daa72c46bbff25e229c4ad2, type: 3}
   actionAnimation: {fileID: -8731992131643994696, guid: 3d7c10dfb76b352458c6ee3cf1acd54f, type: 3}
+  particleOnHold: {fileID: 0}
+  projectileOnAction: {fileID: 0}
   canAttackWithoutAim: 1

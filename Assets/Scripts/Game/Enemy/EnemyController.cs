@@ -19,11 +19,8 @@ public class EnemyController : MonoBehaviour
 
     private float currentLife;
     private float currentShield;
-    private UnityAction onDeath;
 
     public bool Dead = false;
-
-    public UnityAction OnDeath { get => onDeath; set => onDeath = value; }
 
     private void Start()
     {
@@ -75,14 +72,13 @@ public class EnemyController : MonoBehaviour
     private void HandleDeath()
     {
         Dead = true;
-        onDeath?.Invoke();
     }
 
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.TryGetComponent(out Projectile projectile))
         {
-            if (!projectile.ProjectileObject.IsEnemy)
+            if (!projectile.ProjectileObject.IsEnemy && !Dead)
             {
                 HandleHit(projectile.ProjectileObject.Damage);
             }

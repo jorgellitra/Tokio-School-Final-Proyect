@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using TokioSchool.FinalProject.Core;
-using TokioSchool.FinalProject.Player;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -26,12 +25,13 @@ namespace TokioSchool.FinalProject.Enemy
             navAgent.SetDestination(enemy.transform.position);
             navAgent.speed = 0;
             anim.SetTrigger(enemy.animDeath);
-            Debug.Log("EnterState dead");
+            EnemyLevelController.Instance.CheckEnemies();
+            //Debug.Log("EnterState dead");
         }
 
         public override void ExitState()
         {
-            Debug.Log("ExitState dead");
+            //Debug.Log("ExitState dead");
         }
 
         public override EnemyStateMachine.EnemyState GetNextState()

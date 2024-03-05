@@ -1,7 +1,12 @@
 using Cinemachine;
+using System;
 using TokioSchool.FinalProject.Core;
+using TokioSchool.FinalProject.Enums;
 using TokioSchool.FinalProject.Equipments;
+using TokioSchool.FinalProject.UI;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using static UnityEngine.InputSystem.InputAction;
 
 namespace TokioSchool.FinalProject.Player
 {
@@ -18,6 +23,7 @@ namespace TokioSchool.FinalProject.Player
         [SerializeField] private Transform followedCameraTransform;
         [SerializeField] private CinemachineVirtualCamera followedCamera;
         [SerializeField] private CinemachineVirtualCamera aimingCamera;
+        [SerializeField] private UIPlayerController uIPlayerController;
 
         private CharacterController controller;
         private Vector3 playerVelocity;
@@ -31,6 +37,7 @@ namespace TokioSchool.FinalProject.Player
         private Animator animator;
         private float currentStamina;
         private float currentLife;
+        private PlayerData playerData;
 
         private int animSpeed;
         private int animYSpeed;
@@ -48,15 +55,27 @@ namespace TokioSchool.FinalProject.Player
         public bool Aiming { get => aiming; }
         public Quaternion Rotation { get => cameraTransform.rotation; }
 
+        private void OnEnable()
+        {
+            inputManager = InputManager.Instance;
+            inputManager.GetChangeWeaponAction().performed += ChangeWeapon;
+        }
+
+        private void OnDisable()
+        {
+            inputManager.GetChangeWeaponAction().performed -= ChangeWeapon;
+        }
+
         private void Start()
         {
+            playerData = PlayerPrefsManager.Instance.Load();
             controller = GetComponent<CharacterController>();
             equipment = GetComponent<Equipment>();
+            equipment.SetupWeapon(0);
             animator = GetComponentInChildren<Animator>();
-            inputManager = InputManager.Instance;
             cameraTransform = Camera.main.transform;
             currentStamina = stamina;
-            currentLife = life;
+            currentLife = LevelManager.Instance.CurrentLevel() != ELevels.Minotaur ? playerData.currentPlayerLife : life;
 
             animSpeed = Animator.StringToHash("Speed");
             animYSpeed = Animator.StringToHash("YSpeed");
@@ -105,6 +124,12 @@ namespace TokioSchool.FinalProject.Player
             ApplyPhysics();
 
             animator.SetFloat(animYSpeed, controller.velocity.y);
+        }
+
+        private void ChangeWeapon(CallbackContext context)
+        {
+            equipment.SetupWeapon(context.action.GetBindingIndexForControl(context.control));
+            uIPlayerController.UpdateUI();
         }
 
         private void StaminaHandler()
