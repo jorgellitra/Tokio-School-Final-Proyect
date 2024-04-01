@@ -15,6 +15,7 @@ namespace TokioSchool.FinalProject.Enemy
         public float waitingTimeIdle;
 
         public Transform[] patrolPoints;
+        public BoxCollider[] weaponColliders;
         public float minDistanceToMoveNextPatrolPoint = 1;
         public bool playerInRangeToAttack;
         public bool playerInRangeToChase;
@@ -72,8 +73,8 @@ namespace TokioSchool.FinalProject.Enemy
         {
             float distanceEnemyPlayer = Vector3.Distance(player.transform.position, transform.position);
 
-            playerInRangeToChase = distanceEnemyPlayer < distanceToChasePlayer;
-            playerInRangeToAttack = distanceEnemyPlayer < distanceToAttackPlayer;
+            playerInRangeToChase = distanceEnemyPlayer < distanceToChasePlayer && !player.Dead;
+            playerInRangeToAttack = distanceEnemyPlayer < distanceToAttackPlayer && !player.Dead;
 
             anim.SetFloat(animSpeed, navAgent.velocity.sqrMagnitude);
         }

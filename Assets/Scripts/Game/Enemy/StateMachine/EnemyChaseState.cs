@@ -13,6 +13,8 @@ namespace TokioSchool.FinalProject.Enemy
         private NavMeshAgent navAgent;
         private PlayerController player;
 
+        private Vector3 playerPreviousPosition;
+
         public EnemyChaseState(EnemyStateMachine.EnemyState key, EnemyStateMachine enemy) :
             base(key, enemy)
         {
@@ -35,6 +37,8 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override EnemyStateMachine.EnemyState GetNextState()
         {
+            playerPreviousPosition = player.transform.position;
+
             if (!enemy.playerInRangeToChase)
             {
                 return EnemyStateMachine.EnemyState.Idle;
@@ -50,7 +54,9 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override void UpdateState()
         {
-            //navAgent.SetDestination(player.transform.position);
+
+            navAgent.destination = player.transform.position;
+
         }
 
         public override void OnTriggerEnter(Collider other)

@@ -32,6 +32,7 @@ namespace TokioSchool.FinalProject.Enemy
             navAgent.speed = 0;
             int indexAttack = Random.Range(1, 3);
             anim.SetTrigger("Attack" + indexAttack);
+            ChangeStatusWeaponColliders(true);
             isAttacking = true;
             attackColdownReset = anim.GetCurrentAnimatorStateInfo(0).length;
         }
@@ -39,6 +40,7 @@ namespace TokioSchool.FinalProject.Enemy
         public override void ExitState()
         {
             Debug.Log("ExitState Attack");
+            ChangeStatusWeaponColliders(false);
             isAttacking = false;
             navAgent.speed = enemy.walkSpeed;
         }
@@ -70,6 +72,14 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override void OnTriggerStay(Collider other)
         {
+        }
+
+        private void ChangeStatusWeaponColliders(bool state)
+        {
+            foreach (Collider coll in enemy.weaponColliders)
+            {
+                coll.enabled = state;
+            }
         }
     }
 }

@@ -1,3 +1,5 @@
+using DG.Tweening;
+using Newtonsoft.Json.Bson;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -5,6 +7,7 @@ using TMPro;
 using TokioSchool.FinalProject.Core;
 using TokioSchool.FinalProject.Equipments;
 using TokioSchool.FinalProject.Player;
+using TokioSchool.FinalProject.Tweens;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,18 +20,10 @@ namespace TokioSchool.FinalProject.UI
         [SerializeField] private TextMeshProUGUI timer;
         [SerializeField] private EquipmentSlot startEquipmentSlot;
         [SerializeField] private Weapon startWeapon;
+        [SerializeField] private UIPanel gameOverPanel;
+        [SerializeField] private Image bloodUI;
 
-        [SerializeField] private Crosshair crosshair; //put the UI crosshair object into this field in the inspector
-        [SerializeField] private float gunRecoil;
-        [SerializeField] private float reloadSpeed;
-        [SerializeField] private float settleSpeed;
-        [SerializeField] private float maxCrossHairSize;
-        [SerializeField] private float shotsPerSecond; //how fast this gun shoots
-
-        public Color specialColor;
-
-        private float shotRate;
-        private float nextShotTime;
+        [SerializeField] private TooManyCrosshairs.Crosshair crosshair;
 
         private PlayerController player;
         private EquipmentSlot currentEquipmentSlot;
@@ -40,17 +35,43 @@ namespace TokioSchool.FinalProject.UI
             playerEquipment = player.GetComponent<Equipment>();
         }
 
+        private void OnEnable()
+        {
+            player.OnChangeWeapon += SetupWeaponUI;
+            player.OnAttack += ReloadCrosshair;
+            player.OnHit += OnHitPlayer;
+            player.OnDeath += SwitchToGameOverPanel;
+        }
+
+        private void OnDisable()
+        {
+            player.OnChangeWeapon -= SetupWeaponUI;
+            player.OnAttack -= ReloadCrosshair;
+            player.OnHit -= OnHitPlayer;
+            player.OnDeath -= SwitchToGameOverPanel;
+        }
+
         public override void StartScreen()
         {
             base.StartScreen();
+            SetupCrosshair();
 
             sliderLife.maxValue = player.Life;
             sliderStamina.maxValue = player.Stamina;
             UpdateUI();
         }
 
+        private void SetupCrosshair()
+        {
+            crosshair.SetReloadSpeed(playerEquipment.CurrentWeapon.AttackCooldown);
+        }
+
         private void Update()
         {
+            if (player.Dead)
+            {
+                return;
+            }
             sliderStamina.value = player.CurrentStamina;
             if (!LevelManager.Instance.StopCountingTime)
             {
@@ -58,14 +79,12 @@ namespace TokioSchool.FinalProject.UI
 
                 timer.text = $"{time.Minutes:00}:{time.Seconds:00}:{time.Milliseconds:00}";
             }
-
         }
 
         public void UpdateUI()
         {
             sliderStamina.value = player.CurrentStamina;
             sliderLife.value = player.CurrentLife;
-            SetupWeaponUI();
         }
 
         public void SetupWeaponUI()
@@ -77,8 +96,28 @@ namespace TokioSchool.FinalProject.UI
                     currentEquipmentSlot?.ChangeStatus(false);
                     currentEquipmentSlot = slot;
                     currentEquipmentSlot.ChangeStatus(true);
+                    SetupCrosshair();
                 }
             }
+        }
+
+        public void ReloadCrosshair()
+        {
+            crosshair.DoReload();
+        }
+
+        public void SwitchToGameOverPanel()
+        {
+            UIController.Instance.SwitchScreens(gameOverPanel);
+        }
+
+        private void OnHitPlayer()
+        {
+            UpdateUI();
+            TweenManager.Instance.DoSequence(new List<Tween>() {
+                bloodUI.GetComponent<CanvasGroup>().DOFade(1, .5f),
+                bloodUI.GetComponent<CanvasGroup>().DOFade(0, .5f)
+            });
         }
     }
 }

@@ -20,14 +20,20 @@ namespace TokioSchool.FinalProject.UI
 
         private void OnEnable()
         {
-            leaderboardRequest.OnGetComplete += OnGetComplete;
-            leaderboardRequest.OnPostComplete += OnPostComplete;
+            if (leaderboardRequest != null)
+            {
+                leaderboardRequest.OnGetComplete += OnGetComplete;
+                leaderboardRequest.OnPostComplete += OnPostComplete;
+            }
         }
 
         private void OnDisable()
         {
-            leaderboardRequest.OnGetComplete -= OnGetComplete;
-            leaderboardRequest.OnPostComplete -= OnPostComplete;
+            if (leaderboardRequest != null)
+            {
+                leaderboardRequest.OnGetComplete -= OnGetComplete;
+                leaderboardRequest.OnPostComplete -= OnPostComplete;
+            }
         }
 
         public override void StartScreen()

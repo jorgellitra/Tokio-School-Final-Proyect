@@ -6,15 +6,13 @@ using UnityEngine;
 
 namespace TokioSchool.FinalProject.Enemy
 {
-    public class DragonIdleState : BaseState<DragonStateMachine.DragonState>
+    public class DragonIdleState : BaseState<DragonStateMachine.DragonStates>
     {
-        private float waitingTimeReset;
-        private bool goPatrol;
         private DragonStateMachine enemy;
         private Animator anim;
         private PlayerController player;
 
-        public DragonIdleState(DragonStateMachine.DragonState key, DragonStateMachine enemy) :
+        public DragonIdleState(DragonStateMachine.DragonStates key, DragonStateMachine enemy) :
             base(key, enemy)
         {
             this.enemy = enemy;
@@ -24,45 +22,36 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override void EnterState()
         {
-            waitingTimeReset = enemy.waitingTimeIdle;
-            goPatrol = false;
-
-            //Debug.Log("EnterState idle");
+            Debug.Log("EnterState idle");
         }
 
         public override void ExitState()
         {
-            //Debug.Log("ExitState idle");
+            Debug.Log("ExitState idle");
         }
 
-        public override DragonStateMachine.DragonState GetNextState()
+        public override DragonStateMachine.DragonStates GetNextState()
         {
-            if (enemy.playerInRangeToChase)
-            {
-                return DragonStateMachine.DragonState.Chase;
-            }
-
             if (enemy.Controller.Dead)
             {
-                return DragonStateMachine.DragonState.Dead;
+                return DragonStateMachine.DragonStates.Dead;
             }
 
-            if (goPatrol)
+            if (enemy.playerInRangeToChase)
             {
-                return DragonStateMachine.DragonState.Patrol;
+                return DragonStateMachine.DragonStates.Chase;
             }
 
-            return DragonStateMachine.DragonState.Idle;
+            if (enemy.playerInRangeToAttack)
+            {
+                return DragonStateMachine.DragonStates.Attack;
+            }
+
+            return DragonStateMachine.DragonStates.Idle;
         }
 
         public override void UpdateState()
         {
-            waitingTimeReset -= Time.deltaTime;
-
-            if (waitingTimeReset < 0)
-            {
-                goPatrol = true;
-            }
         }
 
         public override void OnTriggerEnter(Collider other)

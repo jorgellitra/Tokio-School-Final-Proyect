@@ -43,5 +43,11 @@ namespace TokioSchool.FinalProject.Core
         {
             PlayerPrefs.SetString(PLAYER_DATA, JsonConvert.SerializeObject(new PlayerData()));
         }
+
+        public void ResetData()
+        {
+            PlayerData data = new();
+            Save(data);
+        }
     }
 }

@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TokioSchool.FinalProject.Core;
 using TokioSchool.FinalProject.Player;
 using TokioSchool.FinalProject.UI;
@@ -7,18 +9,23 @@ using UnityEngine.AI;
 
 namespace TokioSchool.FinalProject.Enemy
 {
-    public class DragonStateMachine : StateManager<DragonStateMachine.DragonState>
+    public class DragonStateMachine : StateManager<DragonStateMachine.DragonStates>
     {
         public float distanceToChasePlayer = 10f;
-        public float distanceToAttackPlayer = 1f;
+        public float distanceToBasicAttack = 3f;
+        public float distanceToClawAttack = 6f;
+        public float distanceToFlyFlameAttack = 15f;
+        public float distanceToFlameAttack = 10f;
         public float walkSpeed = 3f;
         public float runSpeed = 6f;
         public float waitingTimeIdle;
 
-        public Transform[] patrolPoints;
-        public float minDistanceToMoveNextPatrolPoint = 1;
         public bool playerInRangeToAttack;
         public bool playerInRangeToChase;
+        public bool isTransitioning;
+        public DragonAttacks nextAttack;
+        public Dictionary<DragonAttacks, float> coldownAttacks;
+        public float coldownTimeAttack = 2f;
 
         [SerializeField] private UIController uiController;
         [SerializeField] private UIPanel resultPanel;
@@ -27,24 +34,48 @@ namespace TokioSchool.FinalProject.Enemy
         private NavMeshAgent navAgent;
         private EnemyController controller;
         private PlayerController player;
+        private Dictionary<int, DragonAttacks> attacksAvailable;
+        private float nextAttackDistance;
+        private int nextAttackStartIndex = 0;
+        private DragonPhases currentPhase = DragonPhases.First;
 
         public Animator Anim { get => anim; }
         public PlayerController Player { get => player; }
         public NavMeshAgent NavAgent { get => navAgent; }
         public EnemyController Controller { get => controller; }
+        public DragonAttacks NextAttack { get => nextAttack; }
+        public DragonPhases CurrentPhase { get => currentPhase; }
 
         #region AnimHash
 
-        [HideInInspector] public int animDeath = Animator.StringToHash("Death");
         [HideInInspector] public int animSpeed = Animator.StringToHash("Speed");
-        [HideInInspector] public int animXDirection = Animator.StringToHash("XDirection");
-        [HideInInspector] public int animZDirection = Animator.StringToHash("ZDirection");
+        [HideInInspector] public int animFlying = Animator.StringToHash("Flying");
+        [HideInInspector] public int animTransitioning = Animator.StringToHash("Transitioning");
+        [HideInInspector] public int animScream = Animator.StringToHash("Scream");
+        [HideInInspector] public int animHit = Animator.StringToHash("Hit");
+        [HideInInspector] public int animDead = Animator.StringToHash("Dead");
+        [HideInInspector] public int animLand = Animator.StringToHash("Land");
+        [HideInInspector] public int animAttack1 = Animator.StringToHash("Attack1");
+        [HideInInspector] public int animAttack2 = Animator.StringToHash("Attack2");
+        [HideInInspector] public int animAttack3 = Animator.StringToHash("Attack3");
+        [HideInInspector] public int animAttack4 = Animator.StringToHash("Attack4");
+
 
         #endregion
 
-        public enum DragonState
+        public enum DragonStates
         {
-            Idle, Patrol, Chase, Attack, Dead
+            Idle, Relocate, Chase, Attack, Dead
+        }
+
+        public enum DragonPhases
+        {
+            First = 1, Second, Third
+        }
+
+        public enum DragonAttacks
+        {
+            Basic, Claw, Flyflame, Flame
         }
 
         private void Awake()
@@ -54,22 +85,36 @@ namespace TokioSchool.FinalProject.Enemy
             controller = GetComponent<EnemyController>();
             player = FindFirstObjectByType<PlayerController>();
 
-            DragonIdleState enemyIdleState = new(DragonState.Idle, this);
-            DragonPatrolState enemyPatrolState = new(DragonState.Patrol, this);
-            DragonChaseState enemyChaseState = new(DragonState.Chase, this);
-            DragonAttackState enemyAttackState = new(DragonState.Attack, this);
-            DragonDeadState enemyDeadState = new(DragonState.Dead, this);
+            DragonIdleState enemyIdleState = new(DragonStates.Idle, this);
+            DragonRelocateState enemyPatrolState = new(DragonStates.Relocate, this);
+            DragonChaseState enemyChaseState = new(DragonStates.Chase, this);
+            DragonAttackState enemyAttackState = new(DragonStates.Attack, this);
+            DragonDeadState enemyDeadState = new(DragonStates.Dead, this);
 
-            states.Add(DragonState.Idle, enemyIdleState);
-            states.Add(DragonState.Patrol, enemyPatrolState);
-            states.Add(DragonState.Chase, enemyChaseState);
-            states.Add(DragonState.Attack, enemyAttackState);
-            states.Add(DragonState.Dead, enemyDeadState);
+            states.Add(DragonStates.Idle, enemyIdleState);
+            states.Add(DragonStates.Relocate, enemyPatrolState);
+            states.Add(DragonStates.Chase, enemyChaseState);
+            states.Add(DragonStates.Attack, enemyAttackState);
+            states.Add(DragonStates.Dead, enemyDeadState);
 
-            currentState = states[DragonState.Idle];
+            currentState = states[DragonStates.Idle];
 
-            anim.SetFloat(animXDirection, 0);
-            anim.SetFloat(animZDirection, 1);
+            attacksAvailable = new Dictionary<int, DragonAttacks>
+            {
+                { (int) DragonAttacks.Basic, DragonAttacks.Basic },
+                { (int) DragonAttacks.Claw, DragonAttacks.Claw }
+            };
+
+            coldownAttacks = new Dictionary<DragonAttacks, float>
+            {
+                { DragonAttacks.Basic, 1.05f + coldownTimeAttack },
+                { DragonAttacks.Claw, 3f + coldownTimeAttack },
+                { DragonAttacks.Flame, 2.2f + coldownTimeAttack },
+                { DragonAttacks.Flyflame, 4f + coldownTimeAttack }
+            };
+
+
+            UpdateNextAttack();
         }
 
         private void FixedUpdate()
@@ -77,9 +122,78 @@ namespace TokioSchool.FinalProject.Enemy
             float distanceEnemyPlayer = Vector3.Distance(player.transform.position, transform.position);
 
             playerInRangeToChase = distanceEnemyPlayer < distanceToChasePlayer;
-            playerInRangeToAttack = distanceEnemyPlayer < distanceToAttackPlayer;
+            playerInRangeToAttack = distanceEnemyPlayer < nextAttackDistance;
 
             anim.SetFloat(animSpeed, navAgent.velocity.sqrMagnitude);
+        }
+
+        private void CalculateDistanceToNextAttack()
+        {
+            switch (nextAttack)
+            {
+                case DragonAttacks.Basic:
+                    nextAttackDistance = distanceToBasicAttack;
+                    break;
+                case DragonAttacks.Claw:
+                    nextAttackDistance = distanceToClawAttack;
+                    break;
+                case DragonAttacks.Flyflame:
+                    nextAttackDistance = distanceToFlyFlameAttack;
+                    break;
+                case DragonAttacks.Flame:
+                    nextAttackDistance = distanceToFlameAttack;
+                    break;
+            }
+
+            navAgent.stoppingDistance = nextAttackDistance;
+        }
+
+        public void UpdateNextAttack()
+        {
+            int[] keys = attacksAvailable.Keys.ToArray();
+            int nextAttackInt = Random.Range(nextAttackStartIndex, attacksAvailable.Count);
+            nextAttack = attacksAvailable[keys[nextAttackInt]];
+            CalculateDistanceToNextAttack();
+        }
+
+        public IEnumerator SecondPhase()
+        {
+            isTransitioning = !isTransitioning;
+            var lastSpeed = navAgent.speed;
+            navAgent.speed = 0;
+            anim.SetBool(animTransitioning, isTransitioning);
+            anim.SetTrigger(animScream);
+            currentPhase = DragonPhases.Second;
+
+            yield return new WaitForSeconds(3.1f);
+
+            navAgent.speed = lastSpeed;
+            isTransitioning = !isTransitioning;
+            anim.SetBool(animTransitioning, isTransitioning);
+            anim.SetBool(animFlying, true);
+            nextAttackStartIndex = 2;
+
+            attacksAvailable.Add((int)DragonAttacks.Flyflame, DragonAttacks.Flyflame);
+        }
+
+        public IEnumerator ThirdPhase()
+        {
+            isTransitioning = !isTransitioning;
+            var lastSpeed = navAgent.speed;
+            navAgent.speed = 0;
+            anim.SetBool(animTransitioning, isTransitioning);
+            anim.SetBool(animFlying, false);
+            currentPhase = DragonPhases.Third;
+
+            yield return new WaitForSeconds(3.2f);
+
+            navAgent.speed = lastSpeed;
+            isTransitioning = !isTransitioning;
+            anim.SetBool(animTransitioning, isTransitioning);
+            nextAttackStartIndex = 0;
+
+            attacksAvailable.Remove((int)DragonAttacks.Flyflame);
+            attacksAvailable.Add((int)DragonAttacks.Flame, DragonAttacks.Flame);
         }
 
         public void OnDeath()

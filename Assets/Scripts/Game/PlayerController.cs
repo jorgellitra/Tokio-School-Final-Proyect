@@ -1,10 +1,11 @@
 using Cinemachine;
 using System;
 using TokioSchool.FinalProject.Core;
+using TokioSchool.FinalProject.Enemy;
 using TokioSchool.FinalProject.Enums;
 using TokioSchool.FinalProject.Equipments;
-using TokioSchool.FinalProject.UI;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.InputAction;
 
@@ -21,9 +22,7 @@ namespace TokioSchool.FinalProject.Player
         [SerializeField] private LayerMask groundLayerMask;
         [SerializeField] private Transform groundPlayerTransform;
         [SerializeField] private Transform followedCameraTransform;
-        [SerializeField] private CinemachineVirtualCamera followedCamera;
-        [SerializeField] private CinemachineVirtualCamera aimingCamera;
-        [SerializeField] private UIPlayerController uIPlayerController;
+        [SerializeField] private CinemachineVirtualCamera deadCamera;
 
         private CharacterController controller;
         private Vector3 playerVelocity;
@@ -47,13 +46,20 @@ namespace TokioSchool.FinalProject.Player
         private int animIsCrouched;
         private int animAim;
         private int animJump;
+        private int animHit;
+        private int animDead;
 
         public float CurrentLife { get => currentLife; }
         public float CurrentStamina { get => currentStamina; }
         public float Life { get => life; }
+        public bool Dead { get => currentLife <= 0; }
         public float Stamina { get => stamina; }
         public bool Aiming { get => aiming; }
         public Quaternion Rotation { get => cameraTransform.rotation; }
+        public UnityAction OnChangeWeapon { get; set; }
+        public UnityAction OnAttack { get; set; }
+        public UnityAction OnHit { get; set; }
+        public UnityAction OnDeath { get; set; }
 
         private void OnEnable()
         {
@@ -85,10 +91,17 @@ namespace TokioSchool.FinalProject.Player
             animIsCrouched = Animator.StringToHash("IsCrouched");
             animAim = Animator.StringToHash("Aiming");
             animJump = Animator.StringToHash("Jump");
+            animHit = Animator.StringToHash("Hit");
+            animDead = Animator.StringToHash("Dead");
         }
 
         void Update()
         {
+            if (Dead)
+            {
+                return;
+            }
+
             isGrounded = Physics.CheckSphere(groundPlayerTransform.position, .1f, groundLayerMask);
             lowStamina = currentStamina <= stamina * 0.25f;
 
@@ -129,7 +142,7 @@ namespace TokioSchool.FinalProject.Player
         private void ChangeWeapon(CallbackContext context)
         {
             equipment.SetupWeapon(context.action.GetBindingIndexForControl(context.control));
-            uIPlayerController.UpdateUI();
+            OnChangeWeapon?.Invoke();
         }
 
         private void StaminaHandler()
@@ -153,6 +166,7 @@ namespace TokioSchool.FinalProject.Player
             bool canAttack = (aiming && inputManager.PlayerAttack()) || (equipment.CanAttackWithoutAim && inputManager.PlayerAttack());
             if (canAttack)
             {
+                OnAttack?.Invoke();
                 equipment.ActionAnimation();
             }
         }
@@ -163,18 +177,6 @@ namespace TokioSchool.FinalProject.Player
             {
                 isCrouched = !isCrouched;
                 animator.SetBool(animIsCrouched, isCrouched);
-                //animator.SetTrigger(animAttack);
-                //int totalAmmo = 0;
-                //foreach (Weapon weapon in CurrentWeaponList)
-                //{
-                //    if (weapon.BulletAmmount > 0)
-                //    {
-                //        weapon.OnShoot();
-                //        totalAmmo += weapon.BulletAmmount;
-                //    }
-                //}
-                //currentBullets = totalAmmo;
-                //UIController.Instance.UpdateUI();
             }
         }
 
@@ -206,16 +208,22 @@ namespace TokioSchool.FinalProject.Player
             controller.Move(playerVelocity * Time.deltaTime);
         }
 
-        //public void SetArsenal(EArsenalType type)
-        //{
-        //    equipment.SetArsenal(type);
+        private void OnTriggerEnter(Collider other)
+        {
+            Debug.Log("hit");
+            EnemyController enemy = other.GetComponentInParent<EnemyController>();
+            animator.SetTrigger(animHit);
+            currentLife -= enemy.Damage;
+            OnHit?.Invoke();
 
-        //    int totalAmmo = 0;
-        //    foreach (Weapon weapon in CurrentWeaponList)
-        //    {
-        //        totalAmmo += weapon.BulletAmmount;
-        //    }
-        //    currentBullets = totalAmmo;
-        //}
+            if (currentLife <= 0)
+            {
+                Cursor.lockState = CursorLockMode.Confined;
+                animator.SetTrigger(animDead);
+                controller.enabled = false;
+                deadCamera.Priority = 11;
+                OnDeath?.Invoke();
+            }
+        }
     }
 }

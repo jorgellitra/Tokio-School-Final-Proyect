@@ -7,7 +7,7 @@ using UnityEngine.AI;
 
 namespace TokioSchool.FinalProject.Enemy
 {
-    public class DragonAttackState : BaseState<DragonStateMachine.DragonState>
+    public class DragonAttackState : BaseState<DragonStateMachine.DragonStates>
     {
         private DragonStateMachine enemy;
         private Animator anim;
@@ -17,7 +17,7 @@ namespace TokioSchool.FinalProject.Enemy
         private bool isAttacking = false;
         private float attackColdownReset;
 
-        public DragonAttackState(DragonStateMachine.DragonState key, DragonStateMachine enemy) :
+        public DragonAttackState(DragonStateMachine.DragonStates key, DragonStateMachine enemy) :
             base(key, enemy)
         {
             this.enemy = enemy;
@@ -28,12 +28,15 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override void EnterState()
         {
+            if (enemy.isTransitioning)
+            {
+                return;
+            }
             Debug.Log("EnterState Attack");
             navAgent.speed = 0;
-            int indexAttack = Random.Range(1, 3);
-            anim.SetTrigger("Attack" + indexAttack);
+            anim.SetTrigger(enemy.nextAttack.ToString());
             isAttacking = true;
-            attackColdownReset = anim.GetCurrentAnimatorStateInfo(0).length;
+            attackColdownReset = enemy.coldownAttacks[enemy.nextAttack];
         }
 
         public override void ExitState()
@@ -43,14 +46,20 @@ namespace TokioSchool.FinalProject.Enemy
             navAgent.speed = enemy.walkSpeed;
         }
 
-        public override DragonStateMachine.DragonState GetNextState()
+        public override DragonStateMachine.DragonStates GetNextState()
         {
             if (enemy.Controller.Dead)
             {
-                return DragonStateMachine.DragonState.Dead;
+                return DragonStateMachine.DragonStates.Dead;
             }
 
-            return !isAttacking ? DragonStateMachine.DragonState.Chase : DragonStateMachine.DragonState.Attack;
+            if (!isAttacking)
+            {
+                enemy.UpdateNextAttack();
+                return DragonStateMachine.DragonStates.Chase;
+            }
+
+            return DragonStateMachine.DragonStates.Attack;
         }
 
         public override void UpdateState()
