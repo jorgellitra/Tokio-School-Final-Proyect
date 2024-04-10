@@ -1,8 +1,8 @@
 using Cinemachine;
-using System;
+using DG.Tweening;
+using System.Collections;
 using TokioSchool.FinalProject.Core;
 using TokioSchool.FinalProject.Enemy;
-using TokioSchool.FinalProject.Enums;
 using TokioSchool.FinalProject.Equipments;
 using UnityEngine;
 using UnityEngine.Events;
@@ -36,7 +36,8 @@ namespace TokioSchool.FinalProject.Player
         private Animator animator;
         private float currentStamina;
         private float currentLife;
-        private PlayerData playerData;
+        private bool attackOnCooldown;
+        private bool reloading;
 
         private int animSpeed;
         private int animYSpeed;
@@ -58,8 +59,10 @@ namespace TokioSchool.FinalProject.Player
         public Quaternion Rotation { get => cameraTransform.rotation; }
         public UnityAction OnChangeWeapon { get; set; }
         public UnityAction OnAttack { get; set; }
+        public UnityAction OnReload { get; set; }
         public UnityAction OnHit { get; set; }
         public UnityAction OnDeath { get; set; }
+        public Equipment Equipment { get => equipment; }
 
         private void OnEnable()
         {
@@ -74,14 +77,13 @@ namespace TokioSchool.FinalProject.Player
 
         private void Start()
         {
-            playerData = PlayerPrefsManager.Instance.Load();
             controller = GetComponent<CharacterController>();
             equipment = GetComponent<Equipment>();
             equipment.SetupWeapon(0);
             animator = GetComponentInChildren<Animator>();
             cameraTransform = Camera.main.transform;
             currentStamina = stamina;
-            currentLife = LevelManager.Instance.CurrentLevel() != ELevels.Minotaur ? playerData.currentPlayerLife : life;
+            currentLife = life;
 
             animSpeed = Animator.StringToHash("Speed");
             animYSpeed = Animator.StringToHash("YSpeed");
@@ -95,9 +97,15 @@ namespace TokioSchool.FinalProject.Player
             animDead = Animator.StringToHash("Dead");
         }
 
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawSphere(groundPlayerTransform.position, .1f);
+        }
+
         void Update()
         {
-            if (Dead)
+            if (Dead || LevelManager.Instance.StopCountingTime)
             {
                 return;
             }
@@ -124,14 +132,18 @@ namespace TokioSchool.FinalProject.Player
             move.y = 0f;
             controller.Move(playerSpeed * speedMultiplier * Time.deltaTime * move.normalized);
 
-            playerModel.transform.rotation = Quaternion.Euler(0, cameraTransform.rotation.eulerAngles.y, 0);
+            playerModel.transform.DORotateQuaternion(Quaternion.Euler(0, cameraTransform.rotation.eulerAngles.y, 0), .1f);
 
             animator.SetFloat(animSpeed, controller.velocity.sqrMagnitude);
             animator.SetFloat(animXDirection, movement.x);
             animator.SetFloat(animZDirection, movement.y);
 
-            Aim();
-            Attack();
+            if (!equipment.NeedToReload && !attackOnCooldown && !reloading)
+            {
+                Aim();
+                Attack();
+            }
+            Reload();
             StaminaHandler();
             Crouch();
             ApplyPhysics();
@@ -161,14 +173,40 @@ namespace TokioSchool.FinalProject.Player
             }
         }
 
+        private void Reload()
+        {
+            if (isGrounded && inputManager.PlayerReload())
+            {
+                equipment.Reload();
+                OnReload?.Invoke();
+                StartCoroutine(ReloadCooldownCoroutine(equipment.CurrentWeapon.ReloadCooldown));
+            }
+        }
+
         private void Attack()
         {
             bool canAttack = (aiming && inputManager.PlayerAttack()) || (equipment.CanAttackWithoutAim && inputManager.PlayerAttack());
             if (canAttack)
             {
-                OnAttack?.Invoke();
                 equipment.ActionAnimation();
+                OnAttack?.Invoke();
+                var coolDownAttack = !equipment.CurrentWeapon.DamageableObjectOnAction.IsProyectile ? equipment.CurrentWeapon.ActionAnimation.length : equipment.CurrentWeapon.AttackCooldown;
+                StartCoroutine(AttackCooldownCoroutine(coolDownAttack));
             }
+        }
+
+        IEnumerator ReloadCooldownCoroutine(float seconds)
+        {
+            reloading = true;
+            yield return new WaitForSeconds(seconds);
+            reloading = false;
+        }
+
+        IEnumerator AttackCooldownCoroutine(float seconds)
+        {
+            attackOnCooldown = true;
+            yield return new WaitForSeconds(seconds);
+            attackOnCooldown = false;
         }
 
         private void Crouch()
@@ -186,7 +224,10 @@ namespace TokioSchool.FinalProject.Player
 
             if (isGrounded && inputManager.PlayerAiming())
             {
-                equipment.HoldAnimation();
+                if (!aiming)
+                {
+                    equipment.HoldAnimation();
+                }
                 aiming = true;
             }
             else
@@ -210,7 +251,6 @@ namespace TokioSchool.FinalProject.Player
 
         private void OnTriggerEnter(Collider other)
         {
-            Debug.Log("hit");
             EnemyController enemy = other.GetComponentInParent<EnemyController>();
             animator.SetTrigger(animHit);
             currentLife -= enemy.Damage;

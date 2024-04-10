@@ -1,7 +1,7 @@
 using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
-using TokioSchool.FinalProject.Projectiles;
+using TMPro;
 using TokioSchool.FinalProject.Tweens;
 using UnityEngine;
 using UnityEngine.Events;
@@ -24,6 +24,7 @@ namespace TokioSchool.FinalProject.Enemy
         protected float currentShield;
 
         public bool Dead = false;
+        public bool Hitted = false;
 
         public float Damage { get => damage; }
 
@@ -40,17 +41,24 @@ namespace TokioSchool.FinalProject.Enemy
             sliderShield.value = currentShield;
         }
 
-        protected virtual void HandleHit(float damage)
+        private void FixedUpdate()
         {
+            canvasUI.transform.LookAt(Camera.main.transform.position);
+        }
+
+        public virtual void HandleHit(float damage)
+        {
+            StartCoroutine(HittedCoroutine());
             var damagePopupObject = Instantiate(damagePopupPrefab, damagePopupContainer);
+            damagePopupObject.GetComponent<TextMeshProUGUI>().text = damage.ToString();
 
             TweenManager.Instance.DoSequence(new List<Tween>() {
-            damagePopupObject.GetComponent<CanvasGroup>().DOFade(1, 1),
-            damagePopupObject.GetComponent<CanvasGroup>().DOFade(0, 1)
-        }, () =>
-        {
-            Destroy(damagePopupObject);
-        });
+                damagePopupObject.GetComponent<CanvasGroup>().DOFade(1, .5f),
+                damagePopupObject.GetComponent<CanvasGroup>().DOFade(0, 1.5f)
+            }, () =>
+            {
+                Destroy(damagePopupObject);
+            });
 
             var leftoverDamage = currentShield - damage;
 
@@ -68,37 +76,22 @@ namespace TokioSchool.FinalProject.Enemy
                 sliderShield.value = 0;
             }
 
-            if (currentLife <= 0)
+            if (currentLife <= 0 && !Dead)
             {
                 HandleDeath();
             }
         }
 
-        private void HandleDeath()
+        public virtual void HandleDeath()
         {
             Dead = true;
         }
 
-        private void OnCollisionEnter(Collision collision)
+        IEnumerator HittedCoroutine()
         {
-            if (collision.gameObject.TryGetComponent(out Projectile projectile))
-            {
-                if (!projectile.ProjectileObject.IsEnemy && !Dead)
-                {
-                    HandleHit(projectile.ProjectileObject.Damage);
-                }
-            }
-        }
-
-        private void OnTriggerEnter(Collider other)
-        {
-            if (other.TryGetComponent(out Projectile projectile))
-            {
-                if (!projectile.ProjectileObject.IsEnemy && !Dead)
-                {
-                    HandleHit(projectile.ProjectileObject.Damage);
-                }
-            }
+            Hitted = true;
+            yield return new WaitForEndOfFrame();
+            Hitted = false;
         }
     }
 }

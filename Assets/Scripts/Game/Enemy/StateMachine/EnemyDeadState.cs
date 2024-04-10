@@ -26,12 +26,10 @@ namespace TokioSchool.FinalProject.Enemy
             navAgent.speed = 0;
             anim.SetTrigger(enemy.animDeath);
             EnemyLevelController.Instance.CheckEnemies();
-            //Debug.Log("EnterState dead");
         }
 
         public override void ExitState()
         {
-            //Debug.Log("ExitState dead");
         }
 
         public override EnemyStateMachine.EnemyState GetNextState()

@@ -47,10 +47,6 @@ namespace TokioSchool.FinalProject.Core
         {
             return playerControls.Player.Attack.triggered;
         }
-        public bool PlayerHold()
-        {
-            return playerControls.Player.Hold.IsPressed();
-        }
         public bool PlayerReload()
         {
             return playerControls.Player.Reload.triggered;
@@ -62,10 +58,6 @@ namespace TokioSchool.FinalProject.Core
         public bool PlayerCrouched()
         {
             return playerControls.Player.Crouch.triggered;
-        }
-        public bool PlayerChangeWeaponPressed()
-        {
-            return playerControls.Player.ChangeWeapon.triggered;
         }
         public InputAction GetChangeWeaponAction()
         {

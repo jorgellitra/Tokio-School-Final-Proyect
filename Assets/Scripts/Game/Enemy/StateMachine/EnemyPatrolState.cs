@@ -29,7 +29,6 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override void EnterState()
         {
-            //Debug.Log("EnterState Patrol");
             patrolPointReached = false;
             if (enemy.patrolPoints.Length > 0)
             {
@@ -44,7 +43,7 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override void ExitState()
         {
-            //Debug.Log("ExitState Patrol");
+            enemy.prioritisePatrol = false;
             if (indexPatrolPoint == enemy.patrolPoints.Length - 1)
             {
                 indexPatrolPoint = 0;
@@ -57,7 +56,12 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override EnemyStateMachine.EnemyState GetNextState()
         {
-            if (enemy.playerInRangeToChase)
+            if (enemy.Controller.Hitted)
+            {
+                return EnemyStateMachine.EnemyState.Hit;
+            }
+
+            if (enemy.playerInRangeToChase && !enemy.prioritisePatrol)
             {
                 return EnemyStateMachine.EnemyState.Chase;
             }

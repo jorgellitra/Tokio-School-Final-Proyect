@@ -13,7 +13,8 @@ namespace TokioSchool.FinalProject.Enemy
         private NavMeshAgent navAgent;
         private PlayerController player;
 
-        private Vector3 playerPreviousPosition;
+        private float chasingTimeReset;
+        private bool goIdleTimeout;
 
         public EnemyChaseState(EnemyStateMachine.EnemyState key, EnemyStateMachine enemy) :
             base(key, enemy)
@@ -25,22 +26,26 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override void EnterState()
         {
-            //Debug.Log("EnterState Chase");
+            chasingTimeReset = enemy.chasingTime;
             navAgent.speed = enemy.runSpeed;
+            goIdleTimeout = false;
         }
 
         public override void ExitState()
         {
-            //Debug.Log("ExitState Chase");
             navAgent.speed = enemy.walkSpeed;
         }
 
         public override EnemyStateMachine.EnemyState GetNextState()
         {
-            playerPreviousPosition = player.transform.position;
-
-            if (!enemy.playerInRangeToChase)
+            if (!enemy.playerInRangeToChase && goIdleTimeout)
             {
+                return EnemyStateMachine.EnemyState.Idle;
+            }
+
+            if (goIdleTimeout)
+            {
+                enemy.prioritisePatrol = true;
                 return EnemyStateMachine.EnemyState.Idle;
             }
 
@@ -54,9 +59,10 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override void UpdateState()
         {
-
             navAgent.destination = player.transform.position;
 
+            chasingTimeReset -= Time.deltaTime;
+            goIdleTimeout = chasingTimeReset < 0;
         }
 
         public override void OnTriggerEnter(Collider other)

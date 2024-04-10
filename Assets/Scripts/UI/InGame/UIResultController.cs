@@ -48,10 +48,11 @@ namespace TokioSchool.FinalProject.UI
             List<Leaderboard> leaderboards = JsonConvert.DeserializeObject<List<Leaderboard>>(response.Data);
             PlayerData data = PlayerPrefsManager.Instance.Load();
 
-            var position = leaderboards.FindIndex(l => l.Miliseconds <= data.miliseconds);
+            //plus one because it start from 0
+            var position = leaderboards.FindIndex(l => l.Miliseconds >= data.miliseconds) + 1;
 
             TimeSpan time = TimeSpan.FromMilliseconds(data.miliseconds);
-            timeResultText.text = $"{time.Minutes:00}:{time.Seconds:00}:{time.Milliseconds:00}";
+            timeResultText.text = $"{time.Minutes:00}:{time.Seconds:00}:{time.Milliseconds:000}";
 
             positionText.text = position.ToString();
             leaderboardToSave.Miliseconds = (long)data.miliseconds;

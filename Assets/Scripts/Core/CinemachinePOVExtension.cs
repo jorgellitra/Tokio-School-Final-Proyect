@@ -21,7 +21,7 @@ namespace TokioSchool.FinalProject.Core
 
         protected override void PostPipelineStageCallback(CinemachineVirtualCameraBase vcam, CinemachineCore.Stage stage, ref CameraState state, float deltaTime)
         {
-            if (vcam.Follow && inputManager)
+            if (vcam.Follow && inputManager && !LevelManager.Instance.StopCountingTime)
             {
                 if (stage == CinemachineCore.Stage.Aim)
                 {

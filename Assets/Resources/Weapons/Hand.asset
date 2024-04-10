@@ -13,9 +13,18 @@ MonoBehaviour:
   m_Name: Hand
   m_EditorClassIdentifier: 
   id: bf1a289a-66f1-4dd9-8d19-7ccddbd28d9e
-  title: Hand
-  leftHandPrefab: {fileID: 0}
+  attackCooldown: 0
+  leftHandPrefab: {fileID: 4688207798519612671, guid: 42c1aaa99c3e8694582d70cdc4b74d54, type: 3}
   rightHandPrefab: {fileID: 0}
   holdAnimation: {fileID: 0}
   actionAnimation: {fileID: 190365492218098281, guid: b4ed12fcea5716a4b88a664cf716cfc6, type: 3}
+  holdAudioStart: {fileID: 0}
+  holdAudioEnd: {fileID: 0}
+  actionAudioStart: {fileID: 8300000, guid: 7a043f0917c61774d94c1a6331f30f9c, type: 3}
+  actionAudioEnd: {fileID: 8300000, guid: f4dd3c15a0f88034d968c5783759f52f, type: 3}
+  particleOnHold: {fileID: 0}
+  damageableObjectOnAction: {fileID: 11400000, guid: 368a56aab046c7348bbaaca1ccbabf54, type: 2}
   canAttackWithoutAim: 1
+  numberOfProjectiles: 0
+  projectilesPerLoad: 0
+  reloadCooldown: 0

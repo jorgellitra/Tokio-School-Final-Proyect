@@ -1,19 +1,26 @@
 using Newtonsoft.Json;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using TokioSchool.FinalProject.Singletons;
 using UnityEngine;
 
 namespace TokioSchool.FinalProject.Core
 {
+    [Serializable]
+    public class ProjectilesWeaponData
+    {
+        public int CurrentNumberOfProjectiles;
+        public int CurrentProjectilesLoaded;
+    }
+
     public class PlayerData
     {
         public bool weapon1IsLocked = false;
-        public bool weapon2IsLocked = true;
+        public bool weapon2IsLocked = false;
         public bool weapon3IsLocked = true;
         public bool weapon4IsLocked = true;
-        public int currentPlayerLife = 100;
         public float miliseconds = 0;
+        public Dictionary<string, ProjectilesWeaponData> weaponsData = new();
     }
 
     public class PlayerPrefsManager : Singleton<PlayerPrefsManager>
@@ -23,8 +30,6 @@ namespace TokioSchool.FinalProject.Core
         public PlayerData Load()
         {
             string data = PlayerPrefs.GetString(PLAYER_DATA);
-
-            //Debug.Log(data);
 
             if (string.IsNullOrEmpty(data))
             {
@@ -41,7 +46,7 @@ namespace TokioSchool.FinalProject.Core
 
         public void Save()
         {
-            PlayerPrefs.SetString(PLAYER_DATA, JsonConvert.SerializeObject(new PlayerData()));
+            PlayerPrefs.SetString(PLAYER_DATA, JsonConvert.SerializeObject(Load()));
         }
 
         public void ResetData()

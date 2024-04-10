@@ -18,6 +18,13 @@ MonoBehaviour:
   rightHandPrefab: {fileID: 181317182782703767, guid: de279c52efa61244a8b32928f68e599c, type: 3}
   holdAnimation: {fileID: 5216835599920345141, guid: d6557ad5f7261ce4c8fe9f8f67c9d4cd, type: 3}
   actionAnimation: {fileID: 6571473395271613878, guid: afb2e0e8e5b867f49ad94f4e813c3570, type: 3}
+  holdAudioStart: {fileID: 8300000, guid: 472cc8d8c3d813e4ea323a74b56f6dab, type: 3}
+  holdAudioEnd: {fileID: 8300000, guid: 337ab1023ad704b4eb67261e9480c3d6, type: 3}
+  actionAudioStart: {fileID: 8300000, guid: c1c300e0917b509428f896903169f873, type: 3}
+  actionAudioEnd: {fileID: 0}
   particleOnHold: {fileID: 0}
-  projectileOnAction: {fileID: 11400000, guid: 87050777576b05046b5f8d48d8aea5d7, type: 2}
+  damageableObjectOnAction: {fileID: 11400000, guid: 87050777576b05046b5f8d48d8aea5d7, type: 2}
   canAttackWithoutAim: 0
+  numberOfProjectiles: 10
+  projectilesPerLoad: 2
+  reloadCooldown: 5

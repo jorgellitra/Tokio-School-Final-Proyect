@@ -18,9 +18,8 @@ namespace TokioSchool.FinalProject.Core
 
         private void Start()
         {
-            data = PlayerPrefsManager.Instance.Load();
             StopCountingTime = false;
-            miliseconds = data.miliseconds;
+            miliseconds = 0;
         }
 
         public void LoadScene(string scene)
@@ -33,15 +32,20 @@ namespace TokioSchool.FinalProject.Core
             ELevels currentLevel = Enum.Parse<ELevels>(SceneManager.GetActiveScene().name);
             ELevels nextScene = ELevels.MainMenu;
 
+            data = PlayerPrefsManager.Instance.Load();
+
             switch (currentLevel)
             {
                 case ELevels.MainMenu:
                     data.miliseconds = 0;
-                    data.weapon2IsLocked = false;
+                    data.weapon3IsLocked = true;
+                    data.weapon4IsLocked = true;
                     nextScene = ELevels.Minotaur;
                     break;
                 case ELevels.Minotaur:
-                    data.miliseconds += miliseconds;
+                    data.miliseconds = 0;
+                    data.weapon3IsLocked = true;
+                    data.weapon4IsLocked = true;
                     data.weapon3IsLocked = false;
                     nextScene = ELevels.Zombies;
                     break;
@@ -70,8 +74,14 @@ namespace TokioSchool.FinalProject.Core
         public void SaveTime()
         {
             StopCountingTime = true;
+            data = PlayerPrefsManager.Instance.Load();
             data.miliseconds += miliseconds;
             PlayerPrefsManager.Instance.Save(data);
+        }
+
+        public void ResetTime()
+        {
+            PlayerPrefsManager.Instance.ResetData();
         }
 
         private void Update()

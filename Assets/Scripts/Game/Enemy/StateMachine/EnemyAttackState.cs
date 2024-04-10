@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TokioSchool.FinalProject.Core;
 using TokioSchool.FinalProject.Player;
 using UnityEngine;
@@ -28,25 +26,27 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override void EnterState()
         {
-            Debug.Log("EnterState Attack");
             navAgent.speed = 0;
             int indexAttack = Random.Range(1, 3);
             anim.SetTrigger("Attack" + indexAttack);
-            ChangeStatusWeaponColliders(true);
+            enemy.ChangeStatusWeaponColliders(true);
             isAttacking = true;
-            attackColdownReset = anim.GetCurrentAnimatorStateInfo(0).length;
+            attackColdownReset = 2;
         }
 
         public override void ExitState()
         {
-            Debug.Log("ExitState Attack");
-            ChangeStatusWeaponColliders(false);
+            enemy.ChangeStatusWeaponColliders(false);
             isAttacking = false;
             navAgent.speed = enemy.walkSpeed;
         }
 
         public override EnemyStateMachine.EnemyState GetNextState()
         {
+            if (enemy.Controller.Hitted)
+            {
+                return EnemyStateMachine.EnemyState.Hit;
+            }
             if (enemy.Controller.Dead)
             {
                 return EnemyStateMachine.EnemyState.Dead;
@@ -58,6 +58,11 @@ namespace TokioSchool.FinalProject.Enemy
         public override void UpdateState()
         {
             attackColdownReset -= Time.deltaTime;
+            if (attackColdownReset < 1)
+            {
+                Vector3 direction = player.transform.position - enemy.transform.position;
+                enemy.transform.rotation = Quaternion.Slerp(enemy.transform.rotation, Quaternion.LookRotation(direction), 5 * Time.deltaTime);
+            }
 
             isAttacking = attackColdownReset > 0;
         }
@@ -72,14 +77,6 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override void OnTriggerStay(Collider other)
         {
-        }
-
-        private void ChangeStatusWeaponColliders(bool state)
-        {
-            foreach (Collider coll in enemy.weaponColliders)
-            {
-                coll.enabled = state;
-            }
         }
     }
 }

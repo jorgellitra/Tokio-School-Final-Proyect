@@ -14,8 +14,6 @@ namespace TokioSchool.FinalProject.Core
             using UnityWebRequest webRequest = UnityWebRequest.Get(url);
             yield return webRequest.SendWebRequest();
 
-            Debug.Log("URL: " + url);
-
             if (webRequest.result == UnityWebRequest.Result.ConnectionError)
             {
                 callback(new Response
@@ -28,7 +26,7 @@ namespace TokioSchool.FinalProject.Core
             if (webRequest.isDone)
             {
                 string data = System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data);
-                Debug.Log("Data: " + data);
+
                 callback(new Response
                 {
                     StatusCode = webRequest.responseCode,

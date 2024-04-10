@@ -32,7 +32,7 @@ namespace TokioSchool.FinalProject.Enemy
             {
                 return;
             }
-            Debug.Log("EnterState Attack");
+            ChangeStatusWeaponColliders(true);
             navAgent.speed = 0;
             anim.SetTrigger(enemy.nextAttack.ToString());
             isAttacking = true;
@@ -41,7 +41,7 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override void ExitState()
         {
-            Debug.Log("ExitState Attack");
+            ChangeStatusWeaponColliders(false);
             isAttacking = false;
             navAgent.speed = enemy.walkSpeed;
         }
@@ -66,6 +66,12 @@ namespace TokioSchool.FinalProject.Enemy
         {
             attackColdownReset -= Time.deltaTime;
 
+            if (attackColdownReset < 1)
+            {
+                Vector3 direction = player.transform.position - enemy.transform.position;
+                enemy.transform.rotation = Quaternion.Slerp(enemy.transform.rotation, Quaternion.LookRotation(direction), 5 * Time.deltaTime);
+            }
+
             isAttacking = attackColdownReset > 0;
         }
 
@@ -79,6 +85,14 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override void OnTriggerStay(Collider other)
         {
+        }
+
+        private void ChangeStatusWeaponColliders(bool state)
+        {
+            foreach (Collider coll in enemy.weaponColliders)
+            {
+                coll.enabled = state;
+            }
         }
     }
 }

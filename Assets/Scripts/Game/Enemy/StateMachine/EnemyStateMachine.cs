@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using TokioSchool.FinalProject.Core;
 using TokioSchool.FinalProject.Player;
 using UnityEngine;
@@ -10,6 +9,7 @@ namespace TokioSchool.FinalProject.Enemy
     {
         public float distanceToChasePlayer = 10f;
         public float distanceToAttackPlayer = 1f;
+        public float chasingTime = 4f;
         public float walkSpeed = 3f;
         public float runSpeed = 6f;
         public float waitingTimeIdle;
@@ -19,6 +19,7 @@ namespace TokioSchool.FinalProject.Enemy
         public float minDistanceToMoveNextPatrolPoint = 1;
         public bool playerInRangeToAttack;
         public bool playerInRangeToChase;
+        public bool prioritisePatrol;
 
         private Animator anim;
         private NavMeshAgent navAgent;
@@ -41,7 +42,7 @@ namespace TokioSchool.FinalProject.Enemy
 
         public enum EnemyState
         {
-            Idle, Patrol, Chase, Attack, Dead
+            Idle, Patrol, Hit, Chase, Attack, Dead
         }
 
         private void Awake()
@@ -53,12 +54,14 @@ namespace TokioSchool.FinalProject.Enemy
 
             EnemyIdleState enemyIdleState = new(EnemyState.Idle, this);
             EnemyPatrolState enemyPatrolState = new(EnemyState.Patrol, this);
+            EnemyHitState enemyHitState = new(EnemyState.Hit, this);
             EnemyChaseState enemyChaseState = new(EnemyState.Chase, this);
             EnemyAttackState enemyAttackState = new(EnemyState.Attack, this);
             EnemyDeadState enemyDeadState = new(EnemyState.Dead, this);
 
             states.Add(EnemyState.Idle, enemyIdleState);
             states.Add(EnemyState.Patrol, enemyPatrolState);
+            states.Add(EnemyState.Hit, enemyHitState);
             states.Add(EnemyState.Chase, enemyChaseState);
             states.Add(EnemyState.Attack, enemyAttackState);
             states.Add(EnemyState.Dead, enemyDeadState);
@@ -77,6 +80,14 @@ namespace TokioSchool.FinalProject.Enemy
             playerInRangeToAttack = distanceEnemyPlayer < distanceToAttackPlayer && !player.Dead;
 
             anim.SetFloat(animSpeed, navAgent.velocity.sqrMagnitude);
+        }
+
+        public void ChangeStatusWeaponColliders(bool state)
+        {
+            foreach (Collider coll in weaponColliders)
+            {
+                coll.enabled = state;
+            }
         }
     }
 }

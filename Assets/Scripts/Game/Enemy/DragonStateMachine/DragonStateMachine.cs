@@ -1,9 +1,9 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TokioSchool.FinalProject.Core;
 using TokioSchool.FinalProject.Player;
-using TokioSchool.FinalProject.UI;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -19,6 +19,7 @@ namespace TokioSchool.FinalProject.Enemy
         public float walkSpeed = 3f;
         public float runSpeed = 6f;
         public float waitingTimeIdle;
+        public ParticleSystem flameAtacckEffect;
 
         public bool playerInRangeToAttack;
         public bool playerInRangeToChase;
@@ -26,9 +27,7 @@ namespace TokioSchool.FinalProject.Enemy
         public DragonAttacks nextAttack;
         public Dictionary<DragonAttacks, float> coldownAttacks;
         public float coldownTimeAttack = 2f;
-
-        [SerializeField] private UIController uiController;
-        [SerializeField] private UIPanel resultPanel;
+        public BoxCollider[] weaponColliders;
 
         private Animator anim;
         private NavMeshAgent navAgent;
@@ -65,7 +64,7 @@ namespace TokioSchool.FinalProject.Enemy
 
         public enum DragonStates
         {
-            Idle, Relocate, Chase, Attack, Dead
+            Idle, Chase, Attack, Dead
         }
 
         public enum DragonPhases
@@ -86,13 +85,11 @@ namespace TokioSchool.FinalProject.Enemy
             player = FindFirstObjectByType<PlayerController>();
 
             DragonIdleState enemyIdleState = new(DragonStates.Idle, this);
-            DragonRelocateState enemyPatrolState = new(DragonStates.Relocate, this);
             DragonChaseState enemyChaseState = new(DragonStates.Chase, this);
             DragonAttackState enemyAttackState = new(DragonStates.Attack, this);
             DragonDeadState enemyDeadState = new(DragonStates.Dead, this);
 
             states.Add(DragonStates.Idle, enemyIdleState);
-            states.Add(DragonStates.Relocate, enemyPatrolState);
             states.Add(DragonStates.Chase, enemyChaseState);
             states.Add(DragonStates.Attack, enemyAttackState);
             states.Add(DragonStates.Dead, enemyDeadState);
@@ -112,7 +109,6 @@ namespace TokioSchool.FinalProject.Enemy
                 { DragonAttacks.Flame, 2.2f + coldownTimeAttack },
                 { DragonAttacks.Flyflame, 4f + coldownTimeAttack }
             };
-
 
             UpdateNextAttack();
         }
@@ -174,6 +170,7 @@ namespace TokioSchool.FinalProject.Enemy
             nextAttackStartIndex = 2;
 
             attacksAvailable.Add((int)DragonAttacks.Flyflame, DragonAttacks.Flyflame);
+            UpdateNextAttack();
         }
 
         public IEnumerator ThirdPhase()
@@ -183,6 +180,7 @@ namespace TokioSchool.FinalProject.Enemy
             navAgent.speed = 0;
             anim.SetBool(animTransitioning, isTransitioning);
             anim.SetBool(animFlying, false);
+            transform.DORotate(Vector3.zero, 1);
             currentPhase = DragonPhases.Third;
 
             yield return new WaitForSeconds(3.2f);
@@ -194,13 +192,7 @@ namespace TokioSchool.FinalProject.Enemy
 
             attacksAvailable.Remove((int)DragonAttacks.Flyflame);
             attacksAvailable.Add((int)DragonAttacks.Flame, DragonAttacks.Flame);
-        }
-
-        public void OnDeath()
-        {
-            uiController.SwitchScreens(resultPanel);
-            Cursor.lockState = CursorLockMode.Confined;
-            Time.timeScale = 0;
+            UpdateNextAttack();
         }
     }
 }

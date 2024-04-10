@@ -1,8 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using TokioSchool.FinalProject.Core;
-using TokioSchool.FinalProject.Enums;
 using TokioSchool.FinalProject.Singletons;
 using UnityEngine;
 
@@ -21,6 +18,7 @@ namespace TokioSchool.FinalProject.Enemy
         {
             if (enemies.All(e => e.Dead))
             {
+                PlayerPrefsManager.Instance.Save();
                 LevelManager.Instance.LoadNextLevel(3);
             }
         }

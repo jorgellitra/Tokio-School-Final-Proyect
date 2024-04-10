@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecbb48d84f53727429defdb678f5ce23, type: 3}
   m_Name: Azure Config
   m_EditorClassIdentifier: 
-  baseUrl: https://localhost:44348
+  baseUrl: https://tqc-service.azurewebsites.net
   getLeaderboard: GetLeaderboard
   postLeaderboard: PostLeaderboard

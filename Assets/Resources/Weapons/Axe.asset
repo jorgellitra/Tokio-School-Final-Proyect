@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d74e6693814f6844592119b1c0769408, type: 3}
+  m_Name: Axe
+  m_EditorClassIdentifier: 
+  id: 247068a8-297d-4c49-a203-71e743ae6490
+  attackCooldown: 0.5
+  leftHandPrefab: {fileID: 0}
+  rightHandPrefab: {fileID: 7245490326991772184, guid: f06e57b3b76e15141a9adb3337311717, type: 3}
+  holdAnimation: {fileID: 6589092039564311902, guid: a8bd4d740daa72c46bbff25e229c4ad2, type: 3}
+  actionAnimation: {fileID: -203655887218126122, guid: 4b98ae57c2ee7bc43aacccf9f88ce1df, type: 3}
+  holdAudioStart: {fileID: 0}
+  holdAudioEnd: {fileID: 0}
+  actionAudioStart: {fileID: 8300000, guid: 6209db5cb0053e14b9c355b3f6d1aa0e, type: 3}
+  actionAudioEnd: {fileID: 0}
+  particleOnHold: {fileID: 0}
+  damageableObjectOnAction: {fileID: 11400000, guid: 2d2a327b02f43e448ae1ba422d3c7545, type: 2}
+  canAttackWithoutAim: 1
+  numberOfProjectiles: 0
+  projectilesPerLoad: 0
+  reloadCooldown: 0

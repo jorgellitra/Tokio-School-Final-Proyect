@@ -16,7 +16,7 @@ namespace TokioSchool.FinalProject.UI
             TimeSpan time = TimeSpan.FromMilliseconds(miliseconds);
 
             nameText.text = name;
-            timeText.text = $"{time.Hours:00}:{time.Minutes:00}:{time.Seconds:00}";
+            timeText.text = $"{time.Minutes:00}:{time.Seconds:00}:{time.Milliseconds:000}";
         }
     }
 }

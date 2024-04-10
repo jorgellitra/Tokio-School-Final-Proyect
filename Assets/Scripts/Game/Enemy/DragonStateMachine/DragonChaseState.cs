@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TokioSchool.FinalProject.Core;
 using TokioSchool.FinalProject.Player;
 using UnityEngine;
@@ -23,13 +21,11 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override void EnterState()
         {
-            Debug.Log("EnterState Chase");
             navAgent.speed = enemy.runSpeed;
         }
 
         public override void ExitState()
         {
-            Debug.Log("ExitState Chase");
             navAgent.speed = enemy.walkSpeed;
         }
 
@@ -50,6 +46,11 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override void UpdateState()
         {
+            if (enemy.isTransitioning)
+            {
+                return;
+            }
+
             navAgent.SetDestination(player.transform.position);
         }
 

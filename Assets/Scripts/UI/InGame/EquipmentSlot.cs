@@ -15,6 +15,7 @@ namespace TokioSchool.FinalProject.UI
         [SerializeField] private Image bgImage;
         [SerializeField] private Sprite activeImage;
         [SerializeField] private Sprite unActiveImage;
+        [SerializeField] private GameObject lockedImage;
 
         public Weapon Weapon { get => weapon; }
 
@@ -31,6 +32,11 @@ namespace TokioSchool.FinalProject.UI
         public void ChangeStatus(bool state)
         {
             bgImage.sprite = state ? activeImage : unActiveImage;
+        }
+
+        public void ChangeStatusLocked(bool state)
+        {
+            lockedImage.SetActive(state);
         }
     }
 }

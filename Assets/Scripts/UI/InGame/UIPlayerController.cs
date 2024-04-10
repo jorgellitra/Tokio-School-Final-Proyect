@@ -1,5 +1,4 @@
 using DG.Tweening;
-using Newtonsoft.Json.Bson;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,6 +21,9 @@ namespace TokioSchool.FinalProject.UI
         [SerializeField] private Weapon startWeapon;
         [SerializeField] private UIPanel gameOverPanel;
         [SerializeField] private Image bloodUI;
+        [SerializeField] private GameObject proyectilesInfo;
+        [SerializeField] private TextMeshProUGUI currentProjectilesText;
+        [SerializeField] private TextMeshProUGUI currentNumberOfProjectilesText;
 
         [SerializeField] private TooManyCrosshairs.Crosshair crosshair;
 
@@ -38,32 +40,33 @@ namespace TokioSchool.FinalProject.UI
         private void OnEnable()
         {
             player.OnChangeWeapon += SetupWeaponUI;
-            player.OnAttack += ReloadCrosshair;
+            player.OnAttack += UpdateUI;
             player.OnHit += OnHitPlayer;
             player.OnDeath += SwitchToGameOverPanel;
+            player.OnReload += ReloadCrosshair;
         }
 
         private void OnDisable()
         {
             player.OnChangeWeapon -= SetupWeaponUI;
-            player.OnAttack -= ReloadCrosshair;
+            player.OnAttack -= UpdateUI;
             player.OnHit -= OnHitPlayer;
             player.OnDeath -= SwitchToGameOverPanel;
+            player.OnReload -= ReloadCrosshair;
         }
 
         public override void StartScreen()
         {
             base.StartScreen();
-            SetupCrosshair();
 
             sliderLife.maxValue = player.Life;
             sliderStamina.maxValue = player.Stamina;
-            UpdateUI();
+            SetupWeaponUI();
         }
 
         private void SetupCrosshair()
         {
-            crosshair.SetReloadSpeed(playerEquipment.CurrentWeapon.AttackCooldown);
+            crosshair.SetReloadSpeed(1 / playerEquipment.CurrentWeapon.ReloadCooldown);
         }
 
         private void Update()
@@ -77,7 +80,7 @@ namespace TokioSchool.FinalProject.UI
             {
                 TimeSpan time = TimeSpan.FromMilliseconds(LevelManager.Instance.miliseconds);
 
-                timer.text = $"{time.Minutes:00}:{time.Seconds:00}:{time.Milliseconds:00}";
+                timer.text = $"{time.Minutes:00}:{time.Seconds:00}:{time.Milliseconds:000}";
             }
         }
 
@@ -85,18 +88,43 @@ namespace TokioSchool.FinalProject.UI
         {
             sliderStamina.value = player.CurrentStamina;
             sliderLife.value = player.CurrentLife;
+
+            proyectilesInfo.SetActive(playerEquipment.CurrentWeapon.HasProjectiles);
+            currentNumberOfProjectilesText.text = playerEquipment.CurrentNumberOfProjectiles.ToString();
+            currentProjectilesText.text = playerEquipment.CurrentProjectilesLoaded.ToString();
         }
 
         public void SetupWeaponUI()
         {
-            foreach (EquipmentSlot slot in GetComponentsInChildren<EquipmentSlot>())
+            EquipmentSlot[] equipmentSlots = GetComponentsInChildren<EquipmentSlot>();
+            PlayerData playerData = PlayerPrefsManager.Instance.Load();
+
+            for (int i = 0; i < equipmentSlots.Length; i++)
             {
-                if (slot.Weapon.Id == playerEquipment.CurrentWeapon.Id)
+                switch (i)
+                {
+                    case 0:
+                        equipmentSlots[i].ChangeStatusLocked(playerData.weapon1IsLocked);
+                        break;
+                    case 1:
+                        equipmentSlots[i].ChangeStatusLocked(playerData.weapon2IsLocked);
+                        break;
+                    case 2:
+                        equipmentSlots[i].ChangeStatusLocked(playerData.weapon3IsLocked);
+                        break;
+                    case 3:
+                        equipmentSlots[i].ChangeStatusLocked(playerData.weapon4IsLocked);
+                        break;
+                }
+
+                if (equipmentSlots[i].Weapon.Id == playerEquipment.CurrentWeapon.Id)
                 {
                     currentEquipmentSlot?.ChangeStatus(false);
-                    currentEquipmentSlot = slot;
+                    currentEquipmentSlot = equipmentSlots[i];
                     currentEquipmentSlot.ChangeStatus(true);
+
                     SetupCrosshair();
+                    UpdateUI();
                 }
             }
         }
@@ -104,6 +132,7 @@ namespace TokioSchool.FinalProject.UI
         public void ReloadCrosshair()
         {
             crosshair.DoReload();
+            UpdateUI();
         }
 
         public void SwitchToGameOverPanel()

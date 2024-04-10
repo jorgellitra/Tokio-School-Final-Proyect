@@ -25,7 +25,6 @@ namespace TokioSchool.FinalProject.UI
         {
             base.StartScreen();
             leaderboardContainer.DestroyChildren();
-            //leaderboardRequest.PostLeaderboard(new Leaderboard() { Name = "new boi", Miliseconds = 49009 });
         }
 
         private void OnGetComplete(Response response)

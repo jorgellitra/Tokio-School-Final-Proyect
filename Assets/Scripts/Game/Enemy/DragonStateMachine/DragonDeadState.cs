@@ -26,13 +26,11 @@ namespace TokioSchool.FinalProject.Enemy
             navAgent.speed = 0;
             anim.SetTrigger(enemy.animDead);
             LevelManager.Instance.SaveTime();
-            enemy.OnDeath();
-            //Debug.Log("EnterState dead");
+            enemy.GetComponent<DragonController>().HandleDeath();
         }
 
         public override void ExitState()
         {
-            //Debug.Log("ExitState dead");
         }
 
         public override DragonStateMachine.DragonStates GetNextState()

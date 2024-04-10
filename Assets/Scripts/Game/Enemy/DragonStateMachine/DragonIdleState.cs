@@ -22,12 +22,10 @@ namespace TokioSchool.FinalProject.Enemy
 
         public override void EnterState()
         {
-            Debug.Log("EnterState idle");
         }
 
         public override void ExitState()
         {
-            Debug.Log("ExitState idle");
         }
 
         public override DragonStateMachine.DragonStates GetNextState()
